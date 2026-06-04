@@ -50,12 +50,20 @@ jobs:
   node-wrapper:
     name: npm wrapper
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 20
+      - name: Install Rust
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+      - name: Build CLI binary for npm package
+        run: scripts/release/build-local-binaries.sh
+      - name: Stage npm package binaries
+        run: scripts/release/stage-npm-package-binaries.sh
       - name: Test npm wrapper
         working-directory: npm/backend-doctor
         run: npm test --if-present
