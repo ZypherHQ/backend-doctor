@@ -1,0 +1,3 @@
+services:
+  node-api:
+    build: ./apps/node-api

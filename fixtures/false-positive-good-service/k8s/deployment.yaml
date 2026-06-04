@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: good-api
+spec:
+  selector:
+    matchLabels:
+      app: good-api
+  template:
+    metadata:
+      labels:
+        app: good-api
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: api
+          image: registry.example.test/good-api:v1.2.3
+          ports:
+            - containerPort: 3000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+          securityContext:
+            allowPrivilegeEscalation: false
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          env:
+            - name: EXAMPLE_DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: good-api
+                  key: database-file

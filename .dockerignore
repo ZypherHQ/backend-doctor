@@ -1,0 +1,14 @@
+.git
+.github
+.orchestration
+target
+dist
+reports
+node_modules
+npm/backend-doctor/node_modules
+npm/backend-doctor/*.tgz
+.env
+.env.*
+*.log
+fixtures
+backend-doctor-plan

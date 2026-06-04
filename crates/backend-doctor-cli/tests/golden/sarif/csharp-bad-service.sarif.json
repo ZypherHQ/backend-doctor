@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "automationDetails": {
+        "id": "backend-doctor/fixtures/csharp-bad-service"
+      },
+      "results": [
+        {
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Program.cs"
+                },
+                "region": {
+                  "startColumn": 5,
+                  "startLine": 13
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Raw SQL appears to use string interpolation or concatenation."
+          },
+          "partialFingerprints": {
+            "backendDoctorFindingId": "fnv64:81b669177675bbc9",
+            "backendDoctorFingerprint": "fnv64:81b669177675bbc9"
+          },
+          "ruleId": "csharp/sql-string-interpolation"
+        },
+        {
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Program.cs"
+                },
+                "region": {
+                  "startColumn": 5,
+                  "startLine": 7
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "CORS policy allows any origin."
+          },
+          "partialFingerprints": {
+            "backendDoctorFindingId": "fnv64:f873b22fc8dcd000",
+            "backendDoctorFingerprint": "fnv64:f873b22fc8dcd000"
+          },
+          "ruleId": "csharp/cors-allow-any-origin"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Program.cs"
+                },
+                "region": {
+                  "startColumn": 5,
+                  "startLine": 12
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "HttpClient is constructed without an obvious timeout policy."
+          },
+          "partialFingerprints": {
+            "backendDoctorFindingId": "fnv64:8c9878a07c79c2b6",
+            "backendDoctorFingerprint": "fnv64:8c9878a07c79c2b6"
+          },
+          "ruleId": "csharp/httpclient-without-timeout"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Program.cs"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 10
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Sensitive-looking ASP.NET endpoint lacks obvious authorization."
+          },
+          "partialFingerprints": {
+            "backendDoctorFindingId": "fnv64:352cf852b59610ef",
+            "backendDoctorFingerprint": "fnv64:352cf852b59610ef"
+          },
+          "ruleId": "csharp/sensitive-endpoint-missing-authorize"
+        }
+      ],
+      "tool": {
+        "driver": {
+          "name": "Backend Doctor",
+          "rules": [
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "fullDescription": {
+                "text": "CORS policy allows any origin."
+              },
+              "id": "csharp/cors-allow-any-origin",
+              "name": "csharp/cors-allow-any-origin",
+              "properties": {
+                "category": "security",
+                "confidence": "high",
+                "sourceTool": "builtin-csharp"
+              },
+              "shortDescription": {
+                "text": "CORS allows every origin"
+              }
+            },
+            {
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "fullDescription": {
+                "text": "HttpClient is constructed without an obvious timeout policy."
+              },
+              "id": "csharp/httpclient-without-timeout",
+              "name": "csharp/httpclient-without-timeout",
+              "properties": {
+                "category": "reliability",
+                "confidence": "medium",
+                "sourceTool": "builtin-csharp"
+              },
+              "shortDescription": {
+                "text": "HttpClient lacks explicit timeout"
+              }
+            },
+            {
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "fullDescription": {
+                "text": "Sensitive-looking ASP.NET endpoint lacks obvious authorization."
+              },
+              "id": "csharp/sensitive-endpoint-missing-authorize",
+              "name": "csharp/sensitive-endpoint-missing-authorize",
+              "properties": {
+                "category": "security",
+                "confidence": "low",
+                "sourceTool": "builtin-csharp"
+              },
+              "shortDescription": {
+                "text": "Sensitive endpoint lacks authorization"
+              }
+            },
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "fullDescription": {
+                "text": "Raw SQL appears to use string interpolation or concatenation."
+              },
+              "id": "csharp/sql-string-interpolation",
+              "name": "csharp/sql-string-interpolation",
+              "properties": {
+                "category": "security",
+                "confidence": "medium",
+                "sourceTool": "builtin-csharp"
+              },
+              "shortDescription": {
+                "text": "SQL built with interpolation"
+              }
+            }
+          ],
+          "semanticVersion": "<tool-version>",
+          "version": "<tool-version>"
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

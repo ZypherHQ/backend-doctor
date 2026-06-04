@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.backend-doctor.local/backend-doctor-config.schema.json",
+  "title": "Backend Doctor Config",
+  "type": "object",
+  "required": [
+    "includeGitignored",
+    "network",
+    "externalTools",
+    "cache",
+    "outputMode",
+    "thresholds",
+    "disabledRules",
+    "rules",
+    "suppressions"
+  ],
+  "properties": {
+    "includeGitignored": { "type": "boolean" },
+    "network": { "type": "boolean" },
+    "externalTools": {
+      "type": "object",
+      "required": [
+        "deep",
+        "runTests",
+        "scanHistory",
+        "installMissingTools",
+        "network",
+        "defaultTimeoutMs"
+      ],
+      "properties": {
+        "deep": { "type": "boolean" },
+        "runTests": { "type": "boolean" },
+        "scanHistory": { "type": "boolean" },
+        "installMissingTools": { "type": "boolean" },
+        "network": { "type": "boolean" },
+        "defaultTimeoutMs": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "cache": {
+      "type": "object",
+      "required": ["enabled", "location", "directory"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "location": { "enum": ["repo-local", "os"] },
+        "directory": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "analysis": {
+      "type": "object",
+      "required": ["enabled", "cache", "adapters"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "cache": { "type": "boolean" },
+        "adapters": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "outputMode": { "enum": ["summary", "verbose", "json"] },
+    "thresholds": {
+      "type": "object",
+      "required": ["minScore", "maxCritical", "maxErrors"],
+      "properties": {
+        "minScore": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "maxCritical": { "type": ["integer", "null"], "minimum": 0 },
+        "maxErrors": { "type": ["integer", "null"], "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "disabledRules": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": ["boolean", "null"] },
+          "severity": { "enum": ["critical", "error", "warning", "info", "note", null] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "suppressions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["rule", "reason", "expires"],
+        "properties": {
+          "rule": { "type": "string" },
+          "path": { "type": ["string", "null"] },
+          "allowBroad": { "type": "boolean" },
+          "reason": { "type": "string", "minLength": 1 },
+          "expires": { "type": ["string", "null"] }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

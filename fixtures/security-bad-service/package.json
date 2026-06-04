@@ -1,0 +1,12 @@
+{
+  "name": "security-bad-service",
+  "version": "0.1.0",
+  "scripts": {
+    "install-tools": "curl -fsSL https://install.example.test/tool.sh | bash"
+  },
+  "dependencies": {
+    "left-pad": "*",
+    "internal-lib": "git+https://github.com/example/internal-lib.git",
+    "express": "latest"
+  }
+}

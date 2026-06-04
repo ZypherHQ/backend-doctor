@@ -1,0 +1,296 @@
+{
+  "schemaVersion": "1.0.0",
+  "toolVersion": "<tool-version>",
+  "startedAt": "<started-at>",
+  "durationMs": 0,
+  "root": "<workspace>/fixtures/ruby-rails-bad-service",
+  "mode": "full",
+  "score": {
+    "value": 91,
+    "label": "Excellent",
+    "categoryScores": [
+      {
+        "category": "architecture",
+        "score": 100
+      },
+      {
+        "category": "correctness",
+        "score": 100
+      },
+      {
+        "category": "dependencies",
+        "score": 100
+      },
+      {
+        "category": "infrastructure",
+        "score": 100
+      },
+      {
+        "category": "reliability",
+        "score": 100
+      },
+      {
+        "category": "security",
+        "score": 91
+      },
+      {
+        "category": "testing",
+        "score": 100
+      },
+      {
+        "category": "maintainability",
+        "score": 100
+      }
+    ],
+    "caps": []
+  },
+  "label": "Excellent",
+  "categoryScores": [
+    {
+      "category": "architecture",
+      "score": 100
+    },
+    {
+      "category": "correctness",
+      "score": 100
+    },
+    {
+      "category": "dependencies",
+      "score": 100
+    },
+    {
+      "category": "infrastructure",
+      "score": 100
+    },
+    {
+      "category": "reliability",
+      "score": 100
+    },
+    {
+      "category": "security",
+      "score": 91
+    },
+    {
+      "category": "testing",
+      "score": 100
+    },
+    {
+      "category": "maintainability",
+      "score": 100
+    }
+  ],
+  "services": [
+    {
+      "id": ".",
+      "path": "<workspace>/fixtures/ruby-rails-bad-service",
+      "languages": [
+        "Ruby"
+      ],
+      "frameworks": [],
+      "metadata": {
+        "layers": "controller,route"
+      }
+    }
+  ],
+  "projectGraph": {
+    "root": "<workspace>/fixtures/ruby-rails-bad-service",
+    "gitRoot": "<workspace>",
+    "workspaceRoot": "<workspace>/fixtures/ruby-rails-bad-service",
+    "monorepo": false,
+    "services": [
+      {
+        "id": ".",
+        "path": "<workspace>/fixtures/ruby-rails-bad-service",
+        "languages": [
+          "Ruby"
+        ],
+        "frameworks": [],
+        "metadata": {
+          "layers": "controller,route"
+        }
+      }
+    ],
+    "languages": [
+      {
+        "name": "Ruby",
+        "confidence": "high",
+        "evidence": [
+          "Gemfile",
+          "app/controllers/users_controller.rb",
+          "config/routes.rb"
+        ]
+      }
+    ],
+    "inventory": {
+      "totalFiles": 3,
+      "sourceFiles": 2,
+      "manifestFiles": 1,
+      "infraFiles": 0,
+      "testFiles": 0,
+      "skippedBinaryFiles": 0,
+      "skippedLargeFiles": 0,
+      "files": [
+        "Gemfile",
+        "app/controllers/users_controller.rb",
+        "config/routes.rb"
+      ]
+    },
+    "infra": {
+      "dockerfiles": [],
+      "composeFiles": [],
+      "kubernetesFiles": [],
+      "helmCharts": [],
+      "terraformFiles": [],
+      "githubActions": [],
+      "gitlabCi": [],
+      "openApiSpecs": [],
+      "migrationFiles": []
+    },
+    "diff": {
+      "enabled": false,
+      "base": null,
+      "fallbackFullScan": false,
+      "changedFiles": [],
+      "impactedFiles": []
+    },
+    "debug": {
+      "root": "<workspace>/fixtures/ruby-rails-bad-service",
+      "gitRoot": "<workspace>",
+      "workspaceRoot": "<workspace>/fixtures/ruby-rails-bad-service",
+      "ignoredPatterns": [
+        ".git",
+        ".hg",
+        ".svn",
+        "target",
+        "node_modules",
+        "build",
+        "dist",
+        ".next",
+        "coverage",
+        "vendor",
+        ".terraform"
+      ],
+      "warnings": [],
+      "decisions": [
+        "scan root <workspace>/fixtures/ruby-rails-bad-service",
+        "inventory files=3 source=2 manifests=1 infra=0",
+        "services detected=1",
+        "languages detected=1",
+        "infra detected=false"
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "fnv64:aa1e793ea48516d7",
+      "fingerprint": "fnv64:aa1e793ea48516d7",
+      "ruleId": "ruby/sql-string-interpolation",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-ruby",
+      "title": "Ruby SQL built with interpolation",
+      "message": "Ruby SQL appears to interpolate dynamic input.",
+      "category": "security",
+      "severity": "critical",
+      "confidence": "medium",
+      "service": ".",
+      "language": "Ruby",
+      "framework": null,
+      "location": {
+        "path": "app/controllers/users_controller.rb",
+        "line": 4,
+        "column": 7,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "[REDACTED security evidence]",
+        "redacted": true,
+        "secretFingerprint": null
+      },
+      "impact": "Dynamic SQL can become injection when request data reaches the query.",
+      "remediation": "Use bind parameters or query APIs that separate SQL from values.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier3",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:21f14d7ff4f37d4c"
+      }
+    }
+  ],
+  "suppressedFindings": [],
+  "tools": [
+    {
+      "name": "backend-doctor-core",
+      "version": null,
+      "status": "ok"
+    }
+  ],
+  "externalToolVersions": [],
+  "externalToolExecutions": [],
+  "config": {
+    "includeGitignored": false,
+    "network": false,
+    "externalTools": {
+      "deep": false,
+      "runTests": false,
+      "scanHistory": false,
+      "installMissingTools": false,
+      "network": false,
+      "defaultTimeoutMs": 30000
+    },
+    "cache": {
+      "enabled": true,
+      "location": "repo-local",
+      "directory": null
+    },
+    "outputMode": "summary",
+    "thresholds": {
+      "minScore": 75,
+      "maxCritical": null,
+      "maxErrors": null
+    },
+    "disabledRules": [],
+    "rules": {},
+    "suppressions": []
+  },
+  "summary": {
+    "totalFindings": 1,
+    "suppressedFindings": 0,
+    "fixableFindings": 1,
+    "safeFixes": 0,
+    "criticalFindings": 1,
+    "errorFindings": 0
+  },
+  "slop": {
+    "index": 0,
+    "findings": 0,
+    "placeholderTests": 0,
+    "productionPlaceholders": 0,
+    "semanticCopyPaste": 0,
+    "spaghettiControlFlow": 0,
+    "swallowedErrors": 0
+  },
+  "coverage": {
+    "languages": [
+      {
+        "language": "Ruby",
+        "tier": "tier3",
+        "maturity": "language-specific",
+        "ruleFamilies": [
+          "language-heuristics",
+          "external-tool-hooks",
+          "security-generic",
+          "dependency-generic",
+          "infra-generic"
+        ],
+        "detectedFiles": 3,
+        "notes": "Tier 3 language-specific heuristic rules and gated external-tool hooks are enabled for this language."
+      }
+    ]
+  }
+}

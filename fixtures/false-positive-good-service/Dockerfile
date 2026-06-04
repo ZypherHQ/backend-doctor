@@ -1,0 +1,8 @@
+FROM node:20.11.1@sha256:0000000000000000000000000000000000000000000000000000000000000000
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY src ./src
+HEALTHCHECK CMD node -e "process.exit(0)"
+EXPOSE 3000
+USER node
+CMD ["npm", "start"]

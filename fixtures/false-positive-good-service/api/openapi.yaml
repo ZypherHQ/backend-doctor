@@ -1,0 +1,53 @@
+openapi: 3.0.3
+info:
+  title: Good API
+  version: 1.0.0
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    UserResponse:
+      type: object
+      required: [id, status]
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+security:
+  - bearerAuth: []
+paths:
+  /users/:id:
+    get:
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: ok
+        "400":
+          description: bad request
+        "500":
+          description: server error
+  /users/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          description: bad request
+        "500":
+          description: server error

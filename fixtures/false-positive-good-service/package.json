@@ -1,0 +1,15 @@
+{
+  "name": "false-positive-good-service",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/app.ts",
+  "scripts": {
+    "start": "node dist/app.js"
+  },
+  "dependencies": {
+    "cors": "2.8.5",
+    "express": "4.18.3",
+    "express-rate-limit": "7.1.5",
+    "zod": "3.22.4"
+  }
+}

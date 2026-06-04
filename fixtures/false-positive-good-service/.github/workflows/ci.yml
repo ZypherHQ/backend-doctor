@@ -1,0 +1,21 @@
+name: ci
+on:
+  pull_request:
+  push:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@0123456789abcdef0123456789abcdef01234567
+      - uses: actions/cache@0123456789abcdef0123456789abcdef01234567
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('package-lock.json') }}
+      - run: npm test
+      - run: backend-doctor scan .
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - run: echo deploy
+      - run: echo migration dry-run

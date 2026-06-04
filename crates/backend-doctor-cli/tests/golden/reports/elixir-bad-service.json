@@ -1,0 +1,294 @@
+{
+  "schemaVersion": "1.0.0",
+  "toolVersion": "<tool-version>",
+  "startedAt": "<started-at>",
+  "durationMs": 0,
+  "root": "<workspace>/fixtures/elixir-bad-service",
+  "mode": "full",
+  "score": {
+    "value": 95,
+    "label": "Excellent",
+    "categoryScores": [
+      {
+        "category": "architecture",
+        "score": 100
+      },
+      {
+        "category": "correctness",
+        "score": 100
+      },
+      {
+        "category": "dependencies",
+        "score": 100
+      },
+      {
+        "category": "infrastructure",
+        "score": 100
+      },
+      {
+        "category": "reliability",
+        "score": 100
+      },
+      {
+        "category": "security",
+        "score": 95
+      },
+      {
+        "category": "testing",
+        "score": 100
+      },
+      {
+        "category": "maintainability",
+        "score": 100
+      }
+    ],
+    "caps": []
+  },
+  "label": "Excellent",
+  "categoryScores": [
+    {
+      "category": "architecture",
+      "score": 100
+    },
+    {
+      "category": "correctness",
+      "score": 100
+    },
+    {
+      "category": "dependencies",
+      "score": 100
+    },
+    {
+      "category": "infrastructure",
+      "score": 100
+    },
+    {
+      "category": "reliability",
+      "score": 100
+    },
+    {
+      "category": "security",
+      "score": 95
+    },
+    {
+      "category": "testing",
+      "score": 100
+    },
+    {
+      "category": "maintainability",
+      "score": 100
+    }
+  ],
+  "services": [
+    {
+      "id": ".",
+      "path": "<workspace>/fixtures/elixir-bad-service",
+      "languages": [
+        "Elixir"
+      ],
+      "frameworks": [],
+      "metadata": {
+        "layers": "service"
+      }
+    }
+  ],
+  "projectGraph": {
+    "root": "<workspace>/fixtures/elixir-bad-service",
+    "gitRoot": "<workspace>",
+    "workspaceRoot": "<workspace>/fixtures/elixir-bad-service",
+    "monorepo": false,
+    "services": [
+      {
+        "id": ".",
+        "path": "<workspace>/fixtures/elixir-bad-service",
+        "languages": [
+          "Elixir"
+        ],
+        "frameworks": [],
+        "metadata": {
+          "layers": "service"
+        }
+      }
+    ],
+    "languages": [
+      {
+        "name": "Elixir",
+        "confidence": "high",
+        "evidence": [
+          "lib/bad_service.ex",
+          "mix.exs"
+        ]
+      }
+    ],
+    "inventory": {
+      "totalFiles": 2,
+      "sourceFiles": 2,
+      "manifestFiles": 1,
+      "infraFiles": 0,
+      "testFiles": 0,
+      "skippedBinaryFiles": 0,
+      "skippedLargeFiles": 0,
+      "files": [
+        "lib/bad_service.ex",
+        "mix.exs"
+      ]
+    },
+    "infra": {
+      "dockerfiles": [],
+      "composeFiles": [],
+      "kubernetesFiles": [],
+      "helmCharts": [],
+      "terraformFiles": [],
+      "githubActions": [],
+      "gitlabCi": [],
+      "openApiSpecs": [],
+      "migrationFiles": []
+    },
+    "diff": {
+      "enabled": false,
+      "base": null,
+      "fallbackFullScan": false,
+      "changedFiles": [],
+      "impactedFiles": []
+    },
+    "debug": {
+      "root": "<workspace>/fixtures/elixir-bad-service",
+      "gitRoot": "<workspace>",
+      "workspaceRoot": "<workspace>/fixtures/elixir-bad-service",
+      "ignoredPatterns": [
+        ".git",
+        ".hg",
+        ".svn",
+        "target",
+        "node_modules",
+        "build",
+        "dist",
+        ".next",
+        "coverage",
+        "vendor",
+        ".terraform"
+      ],
+      "warnings": [],
+      "decisions": [
+        "scan root <workspace>/fixtures/elixir-bad-service",
+        "inventory files=2 source=2 manifests=1 infra=0",
+        "services detected=1",
+        "languages detected=1",
+        "infra detected=false"
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "fnv64:fe51e89e758b51fd",
+      "fingerprint": "fnv64:fe51e89e758b51fd",
+      "ruleId": "elixir/unsafe-atom-conversion",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-elixir",
+      "title": "Elixir creates atoms from input",
+      "message": "String.to_atom is used on a dynamic value.",
+      "category": "security",
+      "severity": "error",
+      "confidence": "high",
+      "service": ".",
+      "language": "Elixir",
+      "framework": null,
+      "location": {
+        "path": "lib/bad_service.ex",
+        "line": 3,
+        "column": 5,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "String.to_atom(name)",
+        "redacted": false,
+        "secretFingerprint": null
+      },
+      "impact": "Atoms are not garbage collected and can exhaust the BEAM VM.",
+      "remediation": "Keep user input as strings or use String.to_existing_atom for allowlisted values.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier3",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:bc0f14137c425ebb"
+      }
+    }
+  ],
+  "suppressedFindings": [],
+  "tools": [
+    {
+      "name": "backend-doctor-core",
+      "version": null,
+      "status": "ok"
+    }
+  ],
+  "externalToolVersions": [],
+  "externalToolExecutions": [],
+  "config": {
+    "includeGitignored": false,
+    "network": false,
+    "externalTools": {
+      "deep": false,
+      "runTests": false,
+      "scanHistory": false,
+      "installMissingTools": false,
+      "network": false,
+      "defaultTimeoutMs": 30000
+    },
+    "cache": {
+      "enabled": true,
+      "location": "repo-local",
+      "directory": null
+    },
+    "outputMode": "summary",
+    "thresholds": {
+      "minScore": 75,
+      "maxCritical": null,
+      "maxErrors": null
+    },
+    "disabledRules": [],
+    "rules": {},
+    "suppressions": []
+  },
+  "summary": {
+    "totalFindings": 1,
+    "suppressedFindings": 0,
+    "fixableFindings": 1,
+    "safeFixes": 0,
+    "criticalFindings": 0,
+    "errorFindings": 1
+  },
+  "slop": {
+    "index": 0,
+    "findings": 0,
+    "placeholderTests": 0,
+    "productionPlaceholders": 0,
+    "semanticCopyPaste": 0,
+    "spaghettiControlFlow": 0,
+    "swallowedErrors": 0
+  },
+  "coverage": {
+    "languages": [
+      {
+        "language": "Elixir",
+        "tier": "tier3",
+        "maturity": "language-specific",
+        "ruleFamilies": [
+          "language-heuristics",
+          "external-tool-hooks",
+          "security-generic",
+          "dependency-generic",
+          "infra-generic"
+        ],
+        "detectedFiles": 2,
+        "notes": "Tier 3 language-specific heuristic rules and gated external-tool hooks are enabled for this language."
+      }
+    ]
+  }
+}

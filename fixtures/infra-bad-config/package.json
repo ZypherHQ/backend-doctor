@@ -1,0 +1,9 @@
+{
+  "name": "infra-bad-config",
+  "scripts": {
+    "dev": "node src/app.ts"
+  },
+  "dependencies": {
+    "express": "*"
+  }
+}

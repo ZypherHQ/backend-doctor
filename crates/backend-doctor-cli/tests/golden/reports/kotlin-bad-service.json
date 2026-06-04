@@ -1,0 +1,315 @@
+{
+  "schemaVersion": "1.0.0",
+  "toolVersion": "<tool-version>",
+  "startedAt": "<started-at>",
+  "durationMs": 0,
+  "root": "<workspace>/fixtures/kotlin-bad-service",
+  "mode": "full",
+  "score": {
+    "value": 91,
+    "label": "Excellent",
+    "categoryScores": [
+      {
+        "category": "architecture",
+        "score": 100
+      },
+      {
+        "category": "correctness",
+        "score": 100
+      },
+      {
+        "category": "dependencies",
+        "score": 100
+      },
+      {
+        "category": "infrastructure",
+        "score": 100
+      },
+      {
+        "category": "reliability",
+        "score": 100
+      },
+      {
+        "category": "security",
+        "score": 91
+      },
+      {
+        "category": "testing",
+        "score": 100
+      },
+      {
+        "category": "maintainability",
+        "score": 100
+      }
+    ],
+    "caps": []
+  },
+  "label": "Excellent",
+  "categoryScores": [
+    {
+      "category": "architecture",
+      "score": 100
+    },
+    {
+      "category": "correctness",
+      "score": 100
+    },
+    {
+      "category": "dependencies",
+      "score": 100
+    },
+    {
+      "category": "infrastructure",
+      "score": 100
+    },
+    {
+      "category": "reliability",
+      "score": 100
+    },
+    {
+      "category": "security",
+      "score": 91
+    },
+    {
+      "category": "testing",
+      "score": 100
+    },
+    {
+      "category": "maintainability",
+      "score": 100
+    }
+  ],
+  "services": [
+    {
+      "id": ".",
+      "path": "<workspace>/fixtures/kotlin-bad-service",
+      "languages": [
+        "Java",
+        "Kotlin"
+      ],
+      "frameworks": [],
+      "metadata": {}
+    }
+  ],
+  "projectGraph": {
+    "root": "<workspace>/fixtures/kotlin-bad-service",
+    "gitRoot": "<workspace>",
+    "workspaceRoot": "<workspace>/fixtures/kotlin-bad-service",
+    "monorepo": false,
+    "services": [
+      {
+        "id": ".",
+        "path": "<workspace>/fixtures/kotlin-bad-service",
+        "languages": [
+          "Java",
+          "Kotlin"
+        ],
+        "frameworks": [],
+        "metadata": {}
+      }
+    ],
+    "languages": [
+      {
+        "name": "Java",
+        "confidence": "high",
+        "evidence": [
+          "build.gradle.kts"
+        ]
+      },
+      {
+        "name": "Kotlin",
+        "confidence": "high",
+        "evidence": [
+          "build.gradle.kts",
+          "settings.gradle.kts",
+          "src/main/kotlin/App.kt"
+        ]
+      }
+    ],
+    "inventory": {
+      "totalFiles": 3,
+      "sourceFiles": 3,
+      "manifestFiles": 1,
+      "infraFiles": 0,
+      "testFiles": 0,
+      "skippedBinaryFiles": 0,
+      "skippedLargeFiles": 0,
+      "files": [
+        "build.gradle.kts",
+        "settings.gradle.kts",
+        "src/main/kotlin/App.kt"
+      ]
+    },
+    "infra": {
+      "dockerfiles": [],
+      "composeFiles": [],
+      "kubernetesFiles": [],
+      "helmCharts": [],
+      "terraformFiles": [],
+      "githubActions": [],
+      "gitlabCi": [],
+      "openApiSpecs": [],
+      "migrationFiles": []
+    },
+    "diff": {
+      "enabled": false,
+      "base": null,
+      "fallbackFullScan": false,
+      "changedFiles": [],
+      "impactedFiles": []
+    },
+    "debug": {
+      "root": "<workspace>/fixtures/kotlin-bad-service",
+      "gitRoot": "<workspace>",
+      "workspaceRoot": "<workspace>/fixtures/kotlin-bad-service",
+      "ignoredPatterns": [
+        ".git",
+        ".hg",
+        ".svn",
+        "target",
+        "node_modules",
+        "build",
+        "dist",
+        ".next",
+        "coverage",
+        "vendor",
+        ".terraform"
+      ],
+      "warnings": [],
+      "decisions": [
+        "scan root <workspace>/fixtures/kotlin-bad-service",
+        "inventory files=3 source=3 manifests=1 infra=0",
+        "services detected=1",
+        "languages detected=2",
+        "infra detected=false"
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "fnv64:080c17ca3d87f0f9",
+      "fingerprint": "fnv64:080c17ca3d87f0f9",
+      "ruleId": "kotlin/unsafe-sql-string-template",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-kotlin",
+      "title": "Kotlin SQL built with string template",
+      "message": "Kotlin SQL appears to use a string template.",
+      "category": "security",
+      "severity": "critical",
+      "confidence": "medium",
+      "service": ".",
+      "language": "Kotlin",
+      "framework": null,
+      "location": {
+        "path": "src/main/kotlin/App.kt",
+        "line": 2,
+        "column": 5,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "[REDACTED security evidence]",
+        "redacted": true,
+        "secretFingerprint": null
+      },
+      "impact": "String templates can mix untrusted input into SQL.",
+      "remediation": "Use prepared statements or framework bind parameters.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier3",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:02370c53d55932f6"
+      }
+    }
+  ],
+  "suppressedFindings": [],
+  "tools": [
+    {
+      "name": "backend-doctor-core",
+      "version": null,
+      "status": "ok"
+    }
+  ],
+  "externalToolVersions": [],
+  "externalToolExecutions": [],
+  "config": {
+    "includeGitignored": false,
+    "network": false,
+    "externalTools": {
+      "deep": false,
+      "runTests": false,
+      "scanHistory": false,
+      "installMissingTools": false,
+      "network": false,
+      "defaultTimeoutMs": 30000
+    },
+    "cache": {
+      "enabled": true,
+      "location": "repo-local",
+      "directory": null
+    },
+    "outputMode": "summary",
+    "thresholds": {
+      "minScore": 75,
+      "maxCritical": null,
+      "maxErrors": null
+    },
+    "disabledRules": [],
+    "rules": {},
+    "suppressions": []
+  },
+  "summary": {
+    "totalFindings": 1,
+    "suppressedFindings": 0,
+    "fixableFindings": 1,
+    "safeFixes": 0,
+    "criticalFindings": 1,
+    "errorFindings": 0
+  },
+  "slop": {
+    "index": 0,
+    "findings": 0,
+    "placeholderTests": 0,
+    "productionPlaceholders": 0,
+    "semanticCopyPaste": 0,
+    "spaghettiControlFlow": 0,
+    "swallowedErrors": 0
+  },
+  "coverage": {
+    "languages": [
+      {
+        "language": "Java",
+        "tier": "mvp",
+        "maturity": "mvp",
+        "ruleFamilies": [
+          "language-heuristics",
+          "agent-patterns",
+          "security-generic",
+          "dependency-generic",
+          "infra-generic"
+        ],
+        "detectedFiles": 1,
+        "notes": "MVP heuristic rule coverage is enabled for this language."
+      },
+      {
+        "language": "Kotlin",
+        "tier": "tier3",
+        "maturity": "language-specific",
+        "ruleFamilies": [
+          "language-heuristics",
+          "external-tool-hooks",
+          "security-generic",
+          "dependency-generic",
+          "infra-generic"
+        ],
+        "detectedFiles": 3,
+        "notes": "Tier 3 language-specific heuristic rules and gated external-tool hooks are enabled for this language."
+      }
+    ]
+  }
+}

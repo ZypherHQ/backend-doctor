@@ -1,0 +1,13 @@
+spring:
+  jpa:
+    open-in-view: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+payments:
+  api-key: fake-secret-value-for-tests
+  webhook-secret: fake-webhook-secret-for-tests

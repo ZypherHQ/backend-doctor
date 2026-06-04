@@ -1,0 +1,33 @@
+[workspace]
+members = [
+    "crates/backend-doctor-analysis",
+    "crates/backend-doctor-cache",
+    "crates/backend-doctor-cli",
+    "crates/backend-doctor-core",
+    "crates/backend-doctor-detect",
+    "crates/backend-doctor-fix",
+    "crates/backend-doctor-plugin-api",
+    "crates/backend-doctor-report",
+    "crates/backend-doctor-rules",
+]
+resolver = "2"
+
+[workspace.package]
+description = "Local backend diagnostics and remediation tooling."
+edition = "2021"
+keywords = ["backend", "diagnostics", "cli", "rust"]
+categories = ["command-line-utilities", "development-tools"]
+license = "MIT"
+readme = "README.md"
+version = "0.1.0"
+
+[workspace.dependencies]
+chrono = { version = "0.4.41", features = ["serde"] }
+clap = { version = "4.5.38", features = ["derive"] }
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+serde_yml = "0.0.12"
+toml = "0.8.22"
+ignore = "0.4.23"
+jsonschema = { version = "0.40.0", default-features = false }
+directories = "6.0.0"

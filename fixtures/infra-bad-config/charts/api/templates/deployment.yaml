@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-chart
+spec:
+  template:
+    spec:
+      containers:
+        - name: api
+          image: example/api:latest

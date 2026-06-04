@@ -1,0 +1,15 @@
+{
+  "results": [
+    {
+      "check_id": "javascript.lang.security.audit.detect-eval-with-expression.detect-eval-with-expression",
+      "path": "src/app.ts",
+      "start": { "line": 4, "col": 1 },
+      "end": { "line": 4, "col": 20 },
+      "extra": {
+        "message": "Detected dynamic code execution",
+        "severity": "ERROR",
+        "metadata": { "cwe": "CWE-95" }
+      }
+    }
+  ]
+}

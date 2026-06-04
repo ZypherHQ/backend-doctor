@@ -1,0 +1,6 @@
+{
+  "name": "backend-doctor/php-good-service",
+  "require": {
+    "php": ">=8.2"
+  }
+}

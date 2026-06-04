@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: good-api
+spec:
+  selector:
+    app: good-api
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000

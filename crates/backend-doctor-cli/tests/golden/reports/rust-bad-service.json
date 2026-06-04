@@ -1,0 +1,411 @@
+{
+  "schemaVersion": "1.0.0",
+  "toolVersion": "<tool-version>",
+  "startedAt": "<started-at>",
+  "durationMs": 0,
+  "root": "<workspace>/fixtures/rust-bad-service",
+  "mode": "full",
+  "score": {
+    "value": 76,
+    "label": "Great",
+    "categoryScores": [
+      {
+        "category": "architecture",
+        "score": 100
+      },
+      {
+        "category": "correctness",
+        "score": 100
+      },
+      {
+        "category": "dependencies",
+        "score": 100
+      },
+      {
+        "category": "infrastructure",
+        "score": 100
+      },
+      {
+        "category": "reliability",
+        "score": 99
+      },
+      {
+        "category": "security",
+        "score": 77
+      },
+      {
+        "category": "testing",
+        "score": 100
+      },
+      {
+        "category": "maintainability",
+        "score": 100
+      }
+    ],
+    "caps": []
+  },
+  "label": "Great",
+  "categoryScores": [
+    {
+      "category": "architecture",
+      "score": 100
+    },
+    {
+      "category": "correctness",
+      "score": 100
+    },
+    {
+      "category": "dependencies",
+      "score": 100
+    },
+    {
+      "category": "infrastructure",
+      "score": 100
+    },
+    {
+      "category": "reliability",
+      "score": 99
+    },
+    {
+      "category": "security",
+      "score": 77
+    },
+    {
+      "category": "testing",
+      "score": 100
+    },
+    {
+      "category": "maintainability",
+      "score": 100
+    }
+  ],
+  "services": [
+    {
+      "id": ".",
+      "path": "<workspace>/fixtures/rust-bad-service",
+      "languages": [
+        "Rust"
+      ],
+      "frameworks": [],
+      "metadata": {}
+    }
+  ],
+  "projectGraph": {
+    "root": "<workspace>/fixtures/rust-bad-service",
+    "gitRoot": "<workspace>",
+    "workspaceRoot": "<workspace>",
+    "monorepo": false,
+    "services": [
+      {
+        "id": ".",
+        "path": "<workspace>/fixtures/rust-bad-service",
+        "languages": [
+          "Rust"
+        ],
+        "frameworks": [],
+        "metadata": {}
+      }
+    ],
+    "languages": [
+      {
+        "name": "Rust",
+        "confidence": "high",
+        "evidence": [
+          "Cargo.toml",
+          "src/main.rs"
+        ]
+      }
+    ],
+    "inventory": {
+      "totalFiles": 2,
+      "sourceFiles": 1,
+      "manifestFiles": 1,
+      "infraFiles": 0,
+      "testFiles": 0,
+      "skippedBinaryFiles": 0,
+      "skippedLargeFiles": 0,
+      "files": [
+        "Cargo.toml",
+        "src/main.rs"
+      ]
+    },
+    "infra": {
+      "dockerfiles": [],
+      "composeFiles": [],
+      "kubernetesFiles": [],
+      "helmCharts": [],
+      "terraformFiles": [],
+      "githubActions": [],
+      "gitlabCi": [],
+      "openApiSpecs": [],
+      "migrationFiles": []
+    },
+    "diff": {
+      "enabled": false,
+      "base": null,
+      "fallbackFullScan": false,
+      "changedFiles": [],
+      "impactedFiles": []
+    },
+    "debug": {
+      "root": "<workspace>/fixtures/rust-bad-service",
+      "gitRoot": "<workspace>",
+      "workspaceRoot": "<workspace>",
+      "ignoredPatterns": [
+        ".git",
+        ".hg",
+        ".svn",
+        "target",
+        "node_modules",
+        "build",
+        "dist",
+        ".next",
+        "coverage",
+        "vendor",
+        ".terraform"
+      ],
+      "warnings": [],
+      "decisions": [
+        "scan root <workspace>/fixtures/rust-bad-service",
+        "inventory files=2 source=1 manifests=1 infra=0",
+        "services detected=1",
+        "languages detected=1",
+        "infra detected=false"
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "fnv64:583dae67dc2bd0cd",
+      "fingerprint": "fnv64:583dae67dc2bd0cd",
+      "ruleId": "rust/command-shell-format",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-rust",
+      "title": "Shell command uses formatted input",
+      "message": "Shell command uses formatted dynamic input.",
+      "category": "security",
+      "severity": "critical",
+      "confidence": "medium",
+      "service": ".",
+      "language": "Rust",
+      "framework": null,
+      "location": {
+        "path": "src/main.rs",
+        "line": 10,
+        "column": 9,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "[REDACTED security evidence]",
+        "redacted": true,
+        "secretFingerprint": null
+      },
+      "impact": "Shell metacharacters can execute unintended commands.",
+      "remediation": "Call the target program directly and pass arguments separately.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier2",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:e4018e0d5ee6e419"
+      }
+    },
+    {
+      "id": "fnv64:361708bb8fb9cd1c",
+      "fingerprint": "fnv64:361708bb8fb9cd1c",
+      "ruleId": "rust/sql-format-string",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-rust",
+      "title": "SQL built with format macro",
+      "message": "SQL query appears to be built with format!.",
+      "category": "security",
+      "severity": "critical",
+      "confidence": "medium",
+      "service": ".",
+      "language": "Rust",
+      "framework": null,
+      "location": {
+        "path": "src/main.rs",
+        "line": 8,
+        "column": 5,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "[REDACTED security evidence]",
+        "redacted": true,
+        "secretFingerprint": null
+      },
+      "impact": "Formatted request values in SQL can become injection.",
+      "remediation": "Use bind parameters or checked query macros with placeholders.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier2",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:ae034529bcc99bb0"
+      }
+    },
+    {
+      "id": "fnv64:02fcb4796e55a056",
+      "fingerprint": "fnv64:02fcb4796e55a056",
+      "ruleId": "rust/cors-allow-any-origin",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-rust",
+      "title": "CORS allows every origin",
+      "message": "CORS configuration allows every origin.",
+      "category": "security",
+      "severity": "error",
+      "confidence": "high",
+      "service": ".",
+      "language": "Rust",
+      "framework": null,
+      "location": {
+        "path": "src/main.rs",
+        "line": 13,
+        "column": 5,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "let _cors = Cors::permissive();",
+        "redacted": false,
+        "secretFingerprint": null
+      },
+      "impact": "Wildcard browser access can expose authenticated APIs.",
+      "remediation": "Restrict origins to trusted hosts.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier2",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:0c01e5d203530f59"
+      }
+    },
+    {
+      "id": "fnv64:6f1d88bb4578870f",
+      "fingerprint": "fnv64:6f1d88bb4578870f",
+      "ruleId": "rust/reqwest-client-without-timeout",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-rust",
+      "title": "Reqwest client lacks timeout",
+      "message": "Reqwest client has no obvious timeout.",
+      "category": "reliability",
+      "severity": "warning",
+      "confidence": "medium",
+      "service": ".",
+      "language": "Rust",
+      "framework": null,
+      "location": {
+        "path": "src/main.rs",
+        "line": 6,
+        "column": 5,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "let _client = reqwest::Client::new();",
+        "redacted": false,
+        "secretFingerprint": null
+      },
+      "impact": "Hung upstreams can hold async tasks and connections.",
+      "remediation": "Configure ClientBuilder::timeout or request-level timeouts.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier2",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:6eceb754405f0c9b"
+      }
+    }
+  ],
+  "suppressedFindings": [],
+  "tools": [
+    {
+      "name": "backend-doctor-core",
+      "version": null,
+      "status": "ok"
+    }
+  ],
+  "externalToolVersions": [],
+  "externalToolExecutions": [],
+  "config": {
+    "includeGitignored": false,
+    "network": false,
+    "externalTools": {
+      "deep": false,
+      "runTests": false,
+      "scanHistory": false,
+      "installMissingTools": false,
+      "network": false,
+      "defaultTimeoutMs": 30000
+    },
+    "cache": {
+      "enabled": true,
+      "location": "repo-local",
+      "directory": null
+    },
+    "outputMode": "summary",
+    "thresholds": {
+      "minScore": 75,
+      "maxCritical": null,
+      "maxErrors": null
+    },
+    "disabledRules": [],
+    "rules": {},
+    "suppressions": []
+  },
+  "summary": {
+    "totalFindings": 4,
+    "suppressedFindings": 0,
+    "fixableFindings": 4,
+    "safeFixes": 0,
+    "criticalFindings": 2,
+    "errorFindings": 1
+  },
+  "slop": {
+    "index": 0,
+    "findings": 0,
+    "placeholderTests": 0,
+    "productionPlaceholders": 0,
+    "semanticCopyPaste": 0,
+    "spaghettiControlFlow": 0,
+    "swallowedErrors": 0
+  },
+  "coverage": {
+    "languages": [
+      {
+        "language": "Rust",
+        "tier": "tier2",
+        "maturity": "language-specific",
+        "ruleFamilies": [
+          "language-heuristics",
+          "backend-security",
+          "external-tool-hooks",
+          "security-generic",
+          "dependency-generic",
+          "infra-generic"
+        ],
+        "detectedFiles": 2,
+        "notes": "Tier 2 language-specific heuristic rules and gated external-tool hooks are enabled for this language."
+      }
+    ]
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "automationDetails": {
+        "id": "backend-doctor/fixtures/kotlin-ktor-bad-service"
+      },
+      "results": [
+        {
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/main/kotlin/com/example/bad/Application.kt"
+                },
+                "region": {
+                  "startColumn": 13,
+                  "startLine": 25
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Kotlin SQL appears to use a string template."
+          },
+          "partialFingerprints": {
+            "backendDoctorFindingId": "fnv64:96dec0a2416766c6",
+            "backendDoctorFingerprint": "fnv64:96dec0a2416766c6"
+          },
+          "ruleId": "kotlin/unsafe-sql-string-template"
+        }
+      ],
+      "tool": {
+        "driver": {
+          "name": "Backend Doctor",
+          "rules": [
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "fullDescription": {
+                "text": "Kotlin SQL appears to use a string template."
+              },
+              "id": "kotlin/unsafe-sql-string-template",
+              "name": "kotlin/unsafe-sql-string-template",
+              "properties": {
+                "category": "security",
+                "confidence": "medium",
+                "sourceTool": "builtin-kotlin"
+              },
+              "shortDescription": {
+                "text": "Kotlin SQL built with string template"
+              }
+            }
+          ],
+          "semanticVersion": "<tool-version>",
+          "version": "<tool-version>"
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

@@ -1,0 +1,16 @@
+class BackendDoctor < Formula
+  desc "CLI for backend architecture, CI, security, and maintainability checks"
+  homepage "__BACKEND_DOCTOR_HOMEPAGE__"
+  url "__BACKEND_DOCTOR_URL__"
+  sha256 "__BACKEND_DOCTOR_SHA256__"
+  version "__BACKEND_DOCTOR_VERSION__"
+  license "MIT"
+
+  def install
+    bin.install "backend-doctor"
+  end
+
+  test do
+    assert_match "backend-doctor", shell_output("#{bin}/backend-doctor --help")
+  end
+end

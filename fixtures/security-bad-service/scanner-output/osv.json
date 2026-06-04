@@ -1,0 +1,15 @@
+{
+  "results": [
+    {
+      "package": { "name": "left-pad", "ecosystem": "npm" },
+      "vulnerabilities": [
+        {
+          "id": "OSV-2026-0001",
+          "summary": "Critical reachable fake vulnerability",
+          "database_specific": { "severity": "CRITICAL" },
+          "reachability": "reachable"
+        }
+      ]
+    }
+  ]
+}

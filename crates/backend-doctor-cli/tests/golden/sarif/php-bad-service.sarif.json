@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "automationDetails": {
+        "id": "backend-doctor/fixtures/php-bad-service"
+      },
+      "results": [
+        {
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "public/index.php"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 5
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "SQL query appears to concatenate request data."
+          },
+          "partialFingerprints": {
+            "backendDoctorFindingId": "fnv64:1e35e1e1225d62c3",
+            "backendDoctorFingerprint": "fnv64:1e35e1e1225d62c3"
+          },
+          "ruleId": "php/pdo-query-string-concat"
+        },
+        {
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "public/index.php"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 7
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Request input is passed to unserialize."
+          },
+          "partialFingerprints": {
+            "backendDoctorFindingId": "fnv64:d517021061838644",
+            "backendDoctorFingerprint": "fnv64:d517021061838644"
+          },
+          "ruleId": "php/unserialize-user-input"
+        },
+        {
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "public/index.php"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 8
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "Shell execution receives request input."
+          },
+          "partialFingerprints": {
+            "backendDoctorFindingId": "fnv64:d56d655283c7a98a",
+            "backendDoctorFingerprint": "fnv64:d56d655283c7a98a"
+          },
+          "ruleId": "php/shell-exec-user-input"
+        },
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "public/index.php"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 2
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "display_errors is enabled."
+          },
+          "partialFingerprints": {
+            "backendDoctorFindingId": "fnv64:8fc6b7fa4b6d342c",
+            "backendDoctorFingerprint": "fnv64:8fc6b7fa4b6d342c"
+          },
+          "ruleId": "php/display-errors-enabled"
+        }
+      ],
+      "tool": {
+        "driver": {
+          "name": "Backend Doctor",
+          "rules": [
+            {
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "fullDescription": {
+                "text": "display_errors is enabled."
+              },
+              "id": "php/display-errors-enabled",
+              "name": "php/display-errors-enabled",
+              "properties": {
+                "category": "security",
+                "confidence": "high",
+                "sourceTool": "builtin-php"
+              },
+              "shortDescription": {
+                "text": "Display errors enabled"
+              }
+            },
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "fullDescription": {
+                "text": "SQL query appears to concatenate request data."
+              },
+              "id": "php/pdo-query-string-concat",
+              "name": "php/pdo-query-string-concat",
+              "properties": {
+                "category": "security",
+                "confidence": "medium",
+                "sourceTool": "builtin-php"
+              },
+              "shortDescription": {
+                "text": "PDO query uses string concatenation"
+              }
+            },
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "fullDescription": {
+                "text": "Shell execution receives request input."
+              },
+              "id": "php/shell-exec-user-input",
+              "name": "php/shell-exec-user-input",
+              "properties": {
+                "category": "security",
+                "confidence": "high",
+                "sourceTool": "builtin-php"
+              },
+              "shortDescription": {
+                "text": "Shell execution uses request input"
+              }
+            },
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "fullDescription": {
+                "text": "Request input is passed to unserialize."
+              },
+              "id": "php/unserialize-user-input",
+              "name": "php/unserialize-user-input",
+              "properties": {
+                "category": "security",
+                "confidence": "high",
+                "sourceTool": "builtin-php"
+              },
+              "shortDescription": {
+                "text": "User input passed to unserialize"
+              }
+            }
+          ],
+          "semanticVersion": "<tool-version>",
+          "version": "<tool-version>"
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

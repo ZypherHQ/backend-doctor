@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "automationDetails": {
+        "id": "backend-doctor/fixtures/python-fastapi-bad-service"
+      },
+      "results": [
+        {
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app.py"
+                },
+                "region": {
+                  "startColumn": 5,
+                  "startLine": 14
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "SQL appears to be built with Python string formatting."
+          },
+          "partialFingerprints": {
+            "backendDoctorFindingId": "fnv64:ee78b801a314361e",
+            "backendDoctorFingerprint": "fnv64:ee78b801a314361e"
+          },
+          "ruleId": "python/sql-string-format"
+        },
+        {
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app.py"
+                },
+                "region": {
+                  "startColumn": 5,
+                  "startLine": 16
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "subprocess uses shell=True with dynamic input."
+          },
+          "partialFingerprints": {
+            "backendDoctorFindingId": "fnv64:a79914411db62783",
+            "backendDoctorFingerprint": "fnv64:a79914411db62783"
+          },
+          "ruleId": "python/subprocess-shell-true"
+        },
+        {
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app.py"
+                },
+                "region": {
+                  "startColumn": 5,
+                  "startLine": 13
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "requests call has no explicit timeout."
+          },
+          "partialFingerprints": {
+            "backendDoctorFindingId": "fnv64:34a803bfc8ee6821",
+            "backendDoctorFingerprint": "fnv64:34a803bfc8ee6821"
+          },
+          "ruleId": "python/requests-without-timeout"
+        },
+        {
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app.py"
+                },
+                "region": {
+                  "startColumn": 5,
+                  "startLine": 15
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "yaml.load is used without SafeLoader."
+          },
+          "partialFingerprints": {
+            "backendDoctorFindingId": "fnv64:6770d6158b93813d",
+            "backendDoctorFingerprint": "fnv64:6770d6158b93813d"
+          },
+          "ruleId": "python/unsafe-yaml-load"
+        }
+      ],
+      "tool": {
+        "driver": {
+          "name": "Backend Doctor",
+          "rules": [
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "fullDescription": {
+                "text": "requests call has no explicit timeout."
+              },
+              "id": "python/requests-without-timeout",
+              "name": "python/requests-without-timeout",
+              "properties": {
+                "category": "reliability",
+                "confidence": "high",
+                "sourceTool": "builtin-python"
+              },
+              "shortDescription": {
+                "text": "Python HTTP request without timeout"
+              }
+            },
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "fullDescription": {
+                "text": "SQL appears to be built with Python string formatting."
+              },
+              "id": "python/sql-string-format",
+              "name": "python/sql-string-format",
+              "properties": {
+                "category": "security",
+                "confidence": "medium",
+                "sourceTool": "builtin-python"
+              },
+              "shortDescription": {
+                "text": "SQL built with string formatting"
+              }
+            },
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "fullDescription": {
+                "text": "subprocess uses shell=True with dynamic input."
+              },
+              "id": "python/subprocess-shell-true",
+              "name": "python/subprocess-shell-true",
+              "properties": {
+                "category": "security",
+                "confidence": "high",
+                "sourceTool": "builtin-python"
+              },
+              "shortDescription": {
+                "text": "Subprocess uses shell=True"
+              }
+            },
+            {
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "fullDescription": {
+                "text": "yaml.load is used without SafeLoader."
+              },
+              "id": "python/unsafe-yaml-load",
+              "name": "python/unsafe-yaml-load",
+              "properties": {
+                "category": "security",
+                "confidence": "high",
+                "sourceTool": "builtin-python"
+              },
+              "shortDescription": {
+                "text": "Unsafe YAML load"
+              }
+            }
+          ],
+          "semanticVersion": "<tool-version>",
+          "version": "<tool-version>"
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

@@ -1,0 +1,17 @@
+services:
+  api:
+    build: .
+    network_mode: host
+    restart: always
+    environment:
+      DATABASE_PASSWORD: bd_fixture_password_123456
+    ports:
+      - "5432:5432"
+    depends_on:
+      - db
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: bd_fixture_pg_password_123456
+    ports:
+      - "5432:5432"

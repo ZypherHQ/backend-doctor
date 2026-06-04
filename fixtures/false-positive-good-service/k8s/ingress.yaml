@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: good-api
+spec:
+  tls:
+    - hosts:
+        - good.example.test
+      credentialName: good-api-tls
+  rules:
+    - host: good.example.test
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: good-api
+                port:
+                  number: 3000

@@ -1,0 +1,4 @@
+[[suppressions]]
+rule = "go/global-mutable-state"
+path = "internal/state/state.go"
+reason = "Fixture keeps one suppressed finding to exercise suppression plumbing."

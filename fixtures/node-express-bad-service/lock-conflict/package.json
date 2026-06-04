@@ -1,0 +1,7 @@
+{
+  "name": "lock-conflict",
+  "private": true,
+  "dependencies": {
+    "express": "4.19.2"
+  }
+}

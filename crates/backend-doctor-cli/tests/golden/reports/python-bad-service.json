@@ -1,0 +1,411 @@
+{
+  "schemaVersion": "1.0.0",
+  "toolVersion": "<tool-version>",
+  "startedAt": "<started-at>",
+  "durationMs": 0,
+  "root": "<workspace>/fixtures/python-bad-service",
+  "mode": "full",
+  "score": {
+    "value": 69,
+    "label": "Needs Work",
+    "categoryScores": [
+      {
+        "category": "architecture",
+        "score": 100
+      },
+      {
+        "category": "correctness",
+        "score": 100
+      },
+      {
+        "category": "dependencies",
+        "score": 100
+      },
+      {
+        "category": "infrastructure",
+        "score": 100
+      },
+      {
+        "category": "reliability",
+        "score": 95
+      },
+      {
+        "category": "security",
+        "score": 74
+      },
+      {
+        "category": "testing",
+        "score": 100
+      },
+      {
+        "category": "maintainability",
+        "score": 100
+      }
+    ],
+    "caps": []
+  },
+  "label": "Needs Work",
+  "categoryScores": [
+    {
+      "category": "architecture",
+      "score": 100
+    },
+    {
+      "category": "correctness",
+      "score": 100
+    },
+    {
+      "category": "dependencies",
+      "score": 100
+    },
+    {
+      "category": "infrastructure",
+      "score": 100
+    },
+    {
+      "category": "reliability",
+      "score": 95
+    },
+    {
+      "category": "security",
+      "score": 74
+    },
+    {
+      "category": "testing",
+      "score": 100
+    },
+    {
+      "category": "maintainability",
+      "score": 100
+    }
+  ],
+  "services": [
+    {
+      "id": ".",
+      "path": "<workspace>/fixtures/python-bad-service",
+      "languages": [
+        "Python"
+      ],
+      "frameworks": [],
+      "metadata": {}
+    }
+  ],
+  "projectGraph": {
+    "root": "<workspace>/fixtures/python-bad-service",
+    "gitRoot": "<workspace>",
+    "workspaceRoot": "<workspace>",
+    "monorepo": false,
+    "services": [
+      {
+        "id": ".",
+        "path": "<workspace>/fixtures/python-bad-service",
+        "languages": [
+          "Python"
+        ],
+        "frameworks": [],
+        "metadata": {}
+      }
+    ],
+    "languages": [
+      {
+        "name": "Python",
+        "confidence": "high",
+        "evidence": [
+          "app.py",
+          "pyproject.toml"
+        ]
+      }
+    ],
+    "inventory": {
+      "totalFiles": 2,
+      "sourceFiles": 1,
+      "manifestFiles": 1,
+      "infraFiles": 0,
+      "testFiles": 0,
+      "skippedBinaryFiles": 0,
+      "skippedLargeFiles": 0,
+      "files": [
+        "app.py",
+        "pyproject.toml"
+      ]
+    },
+    "infra": {
+      "dockerfiles": [],
+      "composeFiles": [],
+      "kubernetesFiles": [],
+      "helmCharts": [],
+      "terraformFiles": [],
+      "githubActions": [],
+      "gitlabCi": [],
+      "openApiSpecs": [],
+      "migrationFiles": []
+    },
+    "diff": {
+      "enabled": false,
+      "base": null,
+      "fallbackFullScan": false,
+      "changedFiles": [],
+      "impactedFiles": []
+    },
+    "debug": {
+      "root": "<workspace>/fixtures/python-bad-service",
+      "gitRoot": "<workspace>",
+      "workspaceRoot": "<workspace>",
+      "ignoredPatterns": [
+        ".git",
+        ".hg",
+        ".svn",
+        "target",
+        "node_modules",
+        "build",
+        "dist",
+        ".next",
+        "coverage",
+        "vendor",
+        ".terraform"
+      ],
+      "warnings": [],
+      "decisions": [
+        "scan root <workspace>/fixtures/python-bad-service",
+        "inventory files=2 source=1 manifests=1 infra=0",
+        "services detected=1",
+        "languages detected=1",
+        "infra detected=false"
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "fnv64:eeec54c0ee4086b1",
+      "fingerprint": "fnv64:eeec54c0ee4086b1",
+      "ruleId": "python/sql-string-format",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-python",
+      "title": "SQL built with string formatting",
+      "message": "SQL appears to be built with Python string formatting.",
+      "category": "security",
+      "severity": "critical",
+      "confidence": "medium",
+      "service": ".",
+      "language": "Python",
+      "framework": null,
+      "location": {
+        "path": "app.py",
+        "line": 13,
+        "column": 5,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "[REDACTED security evidence]",
+        "redacted": true,
+        "secretFingerprint": null
+      },
+      "impact": "User-controlled values formatted into SQL can become injection vulnerabilities.",
+      "remediation": "Use parameter binding instead of formatting values into SQL.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier2",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:fb6ff88dec422355"
+      }
+    },
+    {
+      "id": "fnv64:dc2e0a11583dd1b8",
+      "fingerprint": "fnv64:dc2e0a11583dd1b8",
+      "ruleId": "python/subprocess-shell-true",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-python",
+      "title": "Subprocess uses shell=True",
+      "message": "subprocess uses shell=True with dynamic input.",
+      "category": "security",
+      "severity": "critical",
+      "confidence": "high",
+      "service": ".",
+      "language": "Python",
+      "framework": null,
+      "location": {
+        "path": "app.py",
+        "line": 15,
+        "column": 5,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "[REDACTED security evidence]",
+        "redacted": true,
+        "secretFingerprint": null
+      },
+      "impact": "Shell metacharacters can execute unintended commands.",
+      "remediation": "Use an argument list with shell=False and validate arguments.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier2",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:2f396a75d6a11647"
+      }
+    },
+    {
+      "id": "fnv64:c3dcacba2efaaa53",
+      "fingerprint": "fnv64:c3dcacba2efaaa53",
+      "ruleId": "python/requests-without-timeout",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-python",
+      "title": "Python HTTP request without timeout",
+      "message": "requests call has no explicit timeout.",
+      "category": "reliability",
+      "severity": "error",
+      "confidence": "high",
+      "service": ".",
+      "language": "Python",
+      "framework": null,
+      "location": {
+        "path": "app.py",
+        "line": 12,
+        "column": 5,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "requests.get(\"https://profiles.internal/users/\" + user_id)",
+        "redacted": false,
+        "secretFingerprint": null
+      },
+      "impact": "Hung upstreams can consume worker threads indefinitely.",
+      "remediation": "Pass timeout=(connect, read) or a bounded timeout value.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier2",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:97ef1883a02e7b6e"
+      }
+    },
+    {
+      "id": "fnv64:593e425c50481cd9",
+      "fingerprint": "fnv64:593e425c50481cd9",
+      "ruleId": "python/unsafe-yaml-load",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-python",
+      "title": "Unsafe YAML load",
+      "message": "yaml.load is used without SafeLoader.",
+      "category": "security",
+      "severity": "error",
+      "confidence": "high",
+      "service": ".",
+      "language": "Python",
+      "framework": null,
+      "location": {
+        "path": "app.py",
+        "line": 14,
+        "column": 5,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "yaml.load(request.data)",
+        "redacted": false,
+        "secretFingerprint": null
+      },
+      "impact": "YAML object construction can execute unsafe deserialization paths.",
+      "remediation": "Use yaml.safe_load for untrusted YAML.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier2",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:c95a15b8293c9692"
+      }
+    }
+  ],
+  "suppressedFindings": [],
+  "tools": [
+    {
+      "name": "backend-doctor-core",
+      "version": null,
+      "status": "ok"
+    }
+  ],
+  "externalToolVersions": [],
+  "externalToolExecutions": [],
+  "config": {
+    "includeGitignored": false,
+    "network": false,
+    "externalTools": {
+      "deep": false,
+      "runTests": false,
+      "scanHistory": false,
+      "installMissingTools": false,
+      "network": false,
+      "defaultTimeoutMs": 30000
+    },
+    "cache": {
+      "enabled": true,
+      "location": "repo-local",
+      "directory": null
+    },
+    "outputMode": "summary",
+    "thresholds": {
+      "minScore": 75,
+      "maxCritical": null,
+      "maxErrors": null
+    },
+    "disabledRules": [],
+    "rules": {},
+    "suppressions": []
+  },
+  "summary": {
+    "totalFindings": 4,
+    "suppressedFindings": 0,
+    "fixableFindings": 4,
+    "safeFixes": 0,
+    "criticalFindings": 2,
+    "errorFindings": 2
+  },
+  "slop": {
+    "index": 0,
+    "findings": 0,
+    "placeholderTests": 0,
+    "productionPlaceholders": 0,
+    "semanticCopyPaste": 0,
+    "spaghettiControlFlow": 0,
+    "swallowedErrors": 0
+  },
+  "coverage": {
+    "languages": [
+      {
+        "language": "Python",
+        "tier": "tier2",
+        "maturity": "language-specific",
+        "ruleFamilies": [
+          "language-heuristics",
+          "backend-security",
+          "external-tool-hooks",
+          "security-generic",
+          "dependency-generic",
+          "infra-generic"
+        ],
+        "detectedFiles": 2,
+        "notes": "Tier 2 language-specific heuristic rules and gated external-tool hooks are enabled for this language."
+      }
+    ]
+  }
+}

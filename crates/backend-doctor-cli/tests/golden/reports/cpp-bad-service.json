@@ -1,0 +1,313 @@
+{
+  "schemaVersion": "1.0.0",
+  "toolVersion": "<tool-version>",
+  "startedAt": "<started-at>",
+  "durationMs": 0,
+  "root": "<workspace>/fixtures/cpp-bad-service",
+  "mode": "full",
+  "score": {
+    "value": 88,
+    "label": "Great",
+    "categoryScores": [
+      {
+        "category": "architecture",
+        "score": 100
+      },
+      {
+        "category": "correctness",
+        "score": 100
+      },
+      {
+        "category": "dependencies",
+        "score": 100
+      },
+      {
+        "category": "infrastructure",
+        "score": 100
+      },
+      {
+        "category": "reliability",
+        "score": 100
+      },
+      {
+        "category": "security",
+        "score": 88
+      },
+      {
+        "category": "testing",
+        "score": 100
+      },
+      {
+        "category": "maintainability",
+        "score": 100
+      }
+    ],
+    "caps": []
+  },
+  "label": "Great",
+  "categoryScores": [
+    {
+      "category": "architecture",
+      "score": 100
+    },
+    {
+      "category": "correctness",
+      "score": 100
+    },
+    {
+      "category": "dependencies",
+      "score": 100
+    },
+    {
+      "category": "infrastructure",
+      "score": 100
+    },
+    {
+      "category": "reliability",
+      "score": 100
+    },
+    {
+      "category": "security",
+      "score": 88
+    },
+    {
+      "category": "testing",
+      "score": 100
+    },
+    {
+      "category": "maintainability",
+      "score": 100
+    }
+  ],
+  "services": [
+    {
+      "id": ".",
+      "path": "<workspace>/fixtures/cpp-bad-service",
+      "languages": [
+        "C",
+        "C++"
+      ],
+      "frameworks": [],
+      "metadata": {}
+    }
+  ],
+  "projectGraph": {
+    "root": "<workspace>/fixtures/cpp-bad-service",
+    "gitRoot": "<workspace>",
+    "workspaceRoot": "<workspace>/fixtures/cpp-bad-service",
+    "monorepo": false,
+    "services": [
+      {
+        "id": ".",
+        "path": "<workspace>/fixtures/cpp-bad-service",
+        "languages": [
+          "C",
+          "C++"
+        ],
+        "frameworks": [],
+        "metadata": {}
+      }
+    ],
+    "languages": [
+      {
+        "name": "C",
+        "confidence": "high",
+        "evidence": [
+          "CMakeLists.txt"
+        ]
+      },
+      {
+        "name": "C++",
+        "confidence": "high",
+        "evidence": [
+          "CMakeLists.txt",
+          "main.cpp"
+        ]
+      }
+    ],
+    "inventory": {
+      "totalFiles": 2,
+      "sourceFiles": 1,
+      "manifestFiles": 1,
+      "infraFiles": 0,
+      "testFiles": 0,
+      "skippedBinaryFiles": 0,
+      "skippedLargeFiles": 0,
+      "files": [
+        "CMakeLists.txt",
+        "main.cpp"
+      ]
+    },
+    "infra": {
+      "dockerfiles": [],
+      "composeFiles": [],
+      "kubernetesFiles": [],
+      "helmCharts": [],
+      "terraformFiles": [],
+      "githubActions": [],
+      "gitlabCi": [],
+      "openApiSpecs": [],
+      "migrationFiles": []
+    },
+    "diff": {
+      "enabled": false,
+      "base": null,
+      "fallbackFullScan": false,
+      "changedFiles": [],
+      "impactedFiles": []
+    },
+    "debug": {
+      "root": "<workspace>/fixtures/cpp-bad-service",
+      "gitRoot": "<workspace>",
+      "workspaceRoot": "<workspace>/fixtures/cpp-bad-service",
+      "ignoredPatterns": [
+        ".git",
+        ".hg",
+        ".svn",
+        "target",
+        "node_modules",
+        "build",
+        "dist",
+        ".next",
+        "coverage",
+        "vendor",
+        ".terraform"
+      ],
+      "warnings": [],
+      "decisions": [
+        "scan root <workspace>/fixtures/cpp-bad-service",
+        "inventory files=2 source=1 manifests=1 infra=0",
+        "services detected=1",
+        "languages detected=2",
+        "infra detected=false"
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "fnv64:433941d66088dee2",
+      "fingerprint": "fnv64:433941d66088dee2",
+      "ruleId": "cpp/unsafe-strcpy",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-c",
+      "title": "C++ uses unsafe string copy",
+      "message": "strcpy is used for string copying.",
+      "category": "security",
+      "severity": "critical",
+      "confidence": "high",
+      "service": ".",
+      "language": "C++",
+      "framework": null,
+      "location": {
+        "path": "main.cpp",
+        "line": 4,
+        "column": 3,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "[REDACTED security evidence]",
+        "redacted": true,
+        "secretFingerprint": null
+      },
+      "impact": "Unbounded copies can overflow destination buffers.",
+      "remediation": "Use bounded copies or C++ strings with explicit validation.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier3",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:35639438d81a4b4b"
+      }
+    }
+  ],
+  "suppressedFindings": [],
+  "tools": [
+    {
+      "name": "backend-doctor-core",
+      "version": null,
+      "status": "ok"
+    }
+  ],
+  "externalToolVersions": [],
+  "externalToolExecutions": [],
+  "config": {
+    "includeGitignored": false,
+    "network": false,
+    "externalTools": {
+      "deep": false,
+      "runTests": false,
+      "scanHistory": false,
+      "installMissingTools": false,
+      "network": false,
+      "defaultTimeoutMs": 30000
+    },
+    "cache": {
+      "enabled": true,
+      "location": "repo-local",
+      "directory": null
+    },
+    "outputMode": "summary",
+    "thresholds": {
+      "minScore": 75,
+      "maxCritical": null,
+      "maxErrors": null
+    },
+    "disabledRules": [],
+    "rules": {},
+    "suppressions": []
+  },
+  "summary": {
+    "totalFindings": 1,
+    "suppressedFindings": 0,
+    "fixableFindings": 1,
+    "safeFixes": 0,
+    "criticalFindings": 1,
+    "errorFindings": 0
+  },
+  "slop": {
+    "index": 0,
+    "findings": 0,
+    "placeholderTests": 0,
+    "productionPlaceholders": 0,
+    "semanticCopyPaste": 0,
+    "spaghettiControlFlow": 0,
+    "swallowedErrors": 0
+  },
+  "coverage": {
+    "languages": [
+      {
+        "language": "C",
+        "tier": "tier3",
+        "maturity": "language-specific",
+        "ruleFamilies": [
+          "language-heuristics",
+          "external-tool-hooks",
+          "security-generic",
+          "dependency-generic",
+          "infra-generic"
+        ],
+        "detectedFiles": 1,
+        "notes": "Tier 3 language-specific heuristic rules and gated external-tool hooks are enabled for this language."
+      },
+      {
+        "language": "C++",
+        "tier": "tier3",
+        "maturity": "language-specific",
+        "ruleFamilies": [
+          "language-heuristics",
+          "external-tool-hooks",
+          "security-generic",
+          "dependency-generic",
+          "infra-generic"
+        ],
+        "detectedFiles": 2,
+        "notes": "Tier 3 language-specific heuristic rules and gated external-tool hooks are enabled for this language."
+      }
+    ]
+  }
+}

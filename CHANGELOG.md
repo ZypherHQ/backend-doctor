@@ -1,0 +1,8 @@
+# Changelog
+
+## 0.1.0 Release Candidate (Unreleased)
+
+- Added Phase 0 non-Rust bootstrap scaffolding for npm wrapper, documentation, CI, status tracking, and Codex skill.
+- Implemented and verified phases 1-9 release scope, including CLI reporting, fixture-backed Go/Node/Java/security/infrastructure/API/OpenAPI findings, Tier 2 Python/C#/.NET/PHP/Rust rules, Tier 3 Ruby/Kotlin/Scala/Elixir/C/C++ first integrations, Agent Slop observable-pattern rules, unsupported-language coverage, scoring, safe-fix planning/application, targeted fix filters, guided preview output, rollback coverage, SARIF rendering/schema validation, GitHub annotations, `--fail-on`, JSON Schema report validation, release dry-run workflow, npm wrapper dry-run publishability, Docker build/run, local binary/checksum validation, Homebrew formula generation, cache replay checks, and performance smoke coverage.
+- Hardened deep-cache determinism by excluding root Backend Doctor generated artifacts from cache hashing and cross-layer port collection while preserving nested project `.backend-doctor` files. Bounded external stdout/stderr capture and expanded authorization redaction for Bearer, Basic, Digest, and token variants.
+- `--fix-guided` previews semantic/riskier fixes by default. Guarded guided application is implemented and verified only when explicitly using `--fix-guided --yes` with temporary-copy safeguards; it does not apply without that explicit command. Public npm/Docker/Homebrew/GitHub publishing and hosted upload flows require credentials, remotes, and artifact URLs. Homebrew syntax/audit requires macOS with Ruby/Homebrew.

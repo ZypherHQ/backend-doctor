@@ -1,0 +1,854 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.backend-doctor.local/backend-doctor-report.schema.json",
+  "title": "Backend Doctor Report",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "toolVersion",
+    "startedAt",
+    "durationMs",
+    "root",
+    "mode",
+    "score",
+    "label",
+    "categoryScores",
+    "services",
+    "projectGraph",
+    "findings",
+    "suppressedFindings",
+    "tools",
+    "externalToolVersions",
+    "externalToolExecutions",
+    "config",
+    "summary",
+    "slop",
+    "coverage"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "string" },
+    "toolVersion": { "type": "string" },
+    "startedAt": { "type": "string", "format": "date-time" },
+    "durationMs": { "type": "integer", "minimum": 0 },
+    "root": { "type": "string" },
+    "mode": { "enum": ["full", "diff"] },
+    "score": {
+      "type": "object",
+      "required": ["value", "label", "categoryScores", "caps"],
+      "properties": {
+        "value": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "label": { "enum": ["Excellent", "Great", "Needs Work", "Critical"] },
+        "categoryScores": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/categoryScore" }
+        },
+        "caps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["cap", "reason"],
+            "properties": {
+              "cap": { "type": "integer", "minimum": 0, "maximum": 100 },
+              "reason": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "label": { "enum": ["Excellent", "Great", "Needs Work", "Critical"] },
+    "categoryScores": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/categoryScore" }
+    },
+    "services": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/service" }
+    },
+    "projectGraph": { "$ref": "#/$defs/projectGraph" },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "suppressedFindings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "version", "status"],
+        "properties": {
+          "name": { "type": "string" },
+          "version": { "type": ["string", "null"] },
+          "status": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "externalToolVersions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["tool", "version", "status", "diagnostic"],
+        "properties": {
+          "tool": { "type": "string" },
+          "version": { "type": ["string", "null"] },
+          "status": { "$ref": "#/$defs/externalCommandStatus" },
+          "diagnostic": { "type": ["string", "null"] }
+        },
+        "additionalProperties": false
+      }
+    },
+    "externalToolExecutions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/externalCommandExecution" }
+    },
+    "config": { "$ref": "backend-doctor-config.schema.json" },
+    "summary": {
+      "type": "object",
+      "required": [
+        "totalFindings",
+        "suppressedFindings",
+        "fixableFindings",
+        "safeFixes",
+        "criticalFindings",
+        "errorFindings"
+      ],
+      "properties": {
+        "totalFindings": { "type": "integer", "minimum": 0 },
+        "suppressedFindings": { "type": "integer", "minimum": 0 },
+        "fixableFindings": { "type": "integer", "minimum": 0 },
+        "safeFixes": { "type": "integer", "minimum": 0 },
+        "criticalFindings": { "type": "integer", "minimum": 0 },
+        "errorFindings": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "slop": {
+      "type": "object",
+      "required": [
+        "index",
+        "findings",
+        "placeholderTests",
+        "productionPlaceholders",
+        "swallowedErrors"
+      ],
+      "properties": {
+        "index": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "findings": { "type": "integer", "minimum": 0 },
+        "placeholderTests": { "type": "integer", "minimum": 0 },
+        "productionPlaceholders": { "type": "integer", "minimum": 0 },
+        "semanticCopyPaste": { "type": "integer", "minimum": 0, "default": 0 },
+        "spaghettiControlFlow": { "type": "integer", "minimum": 0, "default": 0 },
+        "swallowedErrors": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["languages"],
+      "properties": {
+        "languages": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/languageCoverage" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "analysisFacts": { "$ref": "#/$defs/analysisFacts" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "category": {
+      "enum": [
+        "architecture",
+        "correctness",
+        "dependencies",
+        "infrastructure",
+        "reliability",
+        "security",
+        "testing",
+        "maintainability"
+      ]
+    },
+    "severity": { "enum": ["critical", "error", "warning", "info", "note"] },
+    "confidence": { "enum": ["high", "medium", "low"] },
+    "fixSafety": { "enum": ["none", "safe", "guided", "risky"] },
+    "coverageTier": { "enum": ["mvp", "tier2", "tier3", "generic"] },
+    "externalCommandStatus": {
+      "enum": ["success", "failure", "missing-tool", "timeout", "cancelled"]
+    },
+    "externalCommandExecution": {
+      "type": "object",
+      "required": [
+        "invocation",
+        "status",
+        "exitCode",
+        "stdoutExcerpt",
+        "stderrExcerpt",
+        "stdoutBytes",
+        "stderrBytes",
+        "stdoutDigest",
+        "stderrDigest",
+        "durationMs",
+        "diagnostic"
+      ],
+      "properties": {
+        "invocation": {
+          "type": "object",
+          "required": ["command", "args", "env", "cwd", "timeoutMs"],
+          "properties": {
+            "command": { "type": "string" },
+            "args": { "type": "array", "items": { "type": "string" } },
+            "env": { "type": "object", "additionalProperties": { "type": "string" } },
+            "cwd": { "type": ["string", "null"] },
+            "timeoutMs": { "type": ["integer", "null"], "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "status": { "$ref": "#/$defs/externalCommandStatus" },
+        "exitCode": { "type": ["integer", "null"] },
+        "stdoutExcerpt": { "type": "string", "maxLength": 4096 },
+        "stderrExcerpt": { "type": "string", "maxLength": 4096 },
+        "stdoutBytes": { "type": "integer", "minimum": 0 },
+        "stderrBytes": { "type": "integer", "minimum": 0 },
+        "stdoutDigest": { "type": "string", "pattern": "^fnv64:[0-9a-f]{16}$" },
+        "stderrDigest": { "type": "string", "pattern": "^fnv64:[0-9a-f]{16}$" },
+        "durationMs": { "type": "integer", "minimum": 0 },
+        "diagnostic": { "type": ["string", "null"] },
+        "cache": {
+          "type": "object",
+          "required": ["status", "key", "reason"],
+          "properties": {
+            "status": { "enum": ["hit", "miss", "disabled", "error"] },
+            "key": { "type": ["string", "null"], "pattern": "^(bdc1-[0-9a-f]{16})?$" },
+            "reason": { "type": ["string", "null"] }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "languageCoverage": {
+      "type": "object",
+      "required": [
+        "language",
+        "tier",
+        "maturity",
+        "ruleFamilies",
+        "detectedFiles",
+        "notes"
+      ],
+      "properties": {
+        "language": { "type": "string" },
+        "tier": { "$ref": "#/$defs/coverageTier" },
+        "maturity": { "type": "string" },
+        "ruleFamilies": { "type": "array", "items": { "type": "string" } },
+        "detectedFiles": { "type": "integer", "minimum": 0 },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "categoryScore": {
+      "type": "object",
+      "required": ["category", "score"],
+      "properties": {
+        "category": { "$ref": "#/$defs/category" },
+        "score": { "type": "integer", "minimum": 0, "maximum": 100 }
+      },
+      "additionalProperties": false
+    },
+    "service": {
+      "type": "object",
+      "required": ["id", "path", "languages", "frameworks", "metadata"],
+      "properties": {
+        "id": { "type": "string" },
+        "path": { "type": "string" },
+        "languages": { "type": "array", "items": { "type": "string" } },
+        "frameworks": { "type": "array", "items": { "type": "string" } },
+        "metadata": { "type": "object", "additionalProperties": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "projectGraph": {
+      "type": "object",
+      "required": [
+        "root",
+        "gitRoot",
+        "workspaceRoot",
+        "monorepo",
+        "services",
+        "languages",
+        "inventory",
+        "infra",
+        "diff",
+        "debug"
+      ],
+      "properties": {
+        "root": { "type": "string" },
+        "gitRoot": { "type": ["string", "null"] },
+        "workspaceRoot": { "type": "string" },
+        "monorepo": { "type": "boolean" },
+        "services": { "type": "array", "items": { "$ref": "#/$defs/service" } },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "confidence", "evidence"],
+            "properties": {
+              "name": { "type": "string" },
+              "confidence": { "enum": ["high", "medium", "low"] },
+              "evidence": { "type": "array", "items": { "type": "string" } }
+            },
+            "additionalProperties": false
+          }
+        },
+        "inventory": {
+          "type": "object",
+          "required": [
+            "totalFiles",
+            "sourceFiles",
+            "manifestFiles",
+            "infraFiles",
+            "testFiles",
+            "skippedBinaryFiles",
+            "skippedLargeFiles",
+            "files"
+          ],
+          "properties": {
+            "totalFiles": { "type": "integer", "minimum": 0 },
+            "sourceFiles": { "type": "integer", "minimum": 0 },
+            "manifestFiles": { "type": "integer", "minimum": 0 },
+            "infraFiles": { "type": "integer", "minimum": 0 },
+            "testFiles": { "type": "integer", "minimum": 0 },
+            "skippedBinaryFiles": { "type": "integer", "minimum": 0 },
+            "skippedLargeFiles": { "type": "integer", "minimum": 0 },
+            "files": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": false
+        },
+        "infra": {
+          "type": "object",
+          "required": [
+            "dockerfiles",
+            "composeFiles",
+            "kubernetesFiles",
+            "helmCharts",
+            "terraformFiles",
+            "githubActions",
+            "gitlabCi",
+            "openApiSpecs",
+            "migrationFiles"
+          ],
+          "properties": {
+            "dockerfiles": { "type": "array", "items": { "type": "string" } },
+            "composeFiles": { "type": "array", "items": { "type": "string" } },
+            "kubernetesFiles": { "type": "array", "items": { "type": "string" } },
+            "helmCharts": { "type": "array", "items": { "type": "string" } },
+            "terraformFiles": { "type": "array", "items": { "type": "string" } },
+            "githubActions": { "type": "array", "items": { "type": "string" } },
+            "gitlabCi": { "type": "array", "items": { "type": "string" } },
+            "openApiSpecs": { "type": "array", "items": { "type": "string" } },
+            "migrationFiles": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": false
+        },
+        "diff": {
+          "type": "object",
+          "required": ["enabled", "base", "fallbackFullScan", "changedFiles", "impactedFiles"],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "base": { "type": ["string", "null"] },
+            "fallbackFullScan": { "type": "boolean" },
+            "changedFiles": { "type": "array", "items": { "type": "string" } },
+            "impactedFiles": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": false
+        },
+        "debug": {
+          "type": "object",
+          "required": ["root", "gitRoot", "workspaceRoot", "ignoredPatterns", "warnings", "decisions"],
+          "properties": {
+            "root": { "type": "string" },
+            "gitRoot": { "type": ["string", "null"] },
+            "workspaceRoot": { "type": "string" },
+            "ignoredPatterns": { "type": "array", "items": { "type": "string" } },
+            "warnings": { "type": "array", "items": { "type": "string" } },
+            "decisions": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "sourcePosition": {
+      "type": "object",
+      "required": ["line", "column", "byteOffset"],
+      "properties": {
+        "line": { "type": "integer", "minimum": 1 },
+        "column": { "type": "integer", "minimum": 1 },
+        "byteOffset": { "type": ["integer", "null"], "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "sourceRange": {
+      "type": "object",
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "$ref": "#/$defs/sourcePosition" },
+        "end": { "$ref": "#/$defs/sourcePosition" }
+      },
+      "additionalProperties": false
+    },
+    "analysisMetadata": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "sourceFileFact": {
+      "type": "object",
+      "required": [
+        "id",
+        "path",
+        "language",
+        "serviceId",
+        "contentHash",
+        "lineCount",
+        "metadata"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "path": { "type": "string" },
+        "language": { "type": "string" },
+        "serviceId": { "type": ["string", "null"] },
+        "contentHash": {
+          "type": ["string", "null"],
+          "pattern": "^(fnv64:[0-9a-f]{16})?$"
+        },
+        "lineCount": { "type": ["integer", "null"], "minimum": 0 },
+        "metadata": { "$ref": "#/$defs/analysisMetadata" }
+      },
+      "additionalProperties": false
+    },
+    "symbolKind": {
+      "enum": [
+        "function",
+        "method",
+        "class",
+        "struct",
+        "enum",
+        "interface",
+        "module",
+        "variable",
+        "constant",
+        "type",
+        "field",
+        "parameter",
+        "unknown"
+      ]
+    },
+    "symbolFact": {
+      "type": "object",
+      "required": [
+        "id",
+        "fileId",
+        "name",
+        "kind",
+        "range",
+        "signature",
+        "visibility",
+        "parentSymbolId",
+        "metadata"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "fileId": { "type": "string" },
+        "name": { "type": "string" },
+        "kind": { "$ref": "#/$defs/symbolKind" },
+        "range": { "anyOf": [{ "$ref": "#/$defs/sourceRange" }, { "type": "null" }] },
+        "signature": { "type": ["string", "null"] },
+        "visibility": { "type": ["string", "null"] },
+        "parentSymbolId": { "type": ["string", "null"] },
+        "metadata": { "$ref": "#/$defs/analysisMetadata" }
+      },
+      "additionalProperties": false
+    },
+    "callFact": {
+      "type": "object",
+      "required": [
+        "id",
+        "fileId",
+        "callerSymbolId",
+        "calleeSymbolId",
+        "calleeName",
+        "range",
+        "arguments",
+        "metadata"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "fileId": { "type": ["string", "null"] },
+        "callerSymbolId": { "type": ["string", "null"] },
+        "calleeSymbolId": { "type": ["string", "null"] },
+        "calleeName": { "type": "string" },
+        "range": { "anyOf": [{ "$ref": "#/$defs/sourceRange" }, { "type": "null" }] },
+        "arguments": { "type": "array", "items": { "type": "string" } },
+        "metadata": { "$ref": "#/$defs/analysisMetadata" }
+      },
+      "additionalProperties": false
+    },
+    "importKind": {
+      "enum": ["module", "package", "file", "namespace", "unknown"]
+    },
+    "importFact": {
+      "type": "object",
+      "required": [
+        "id",
+        "fileId",
+        "module",
+        "alias",
+        "importedSymbols",
+        "kind",
+        "range",
+        "metadata"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "fileId": { "type": ["string", "null"] },
+        "module": { "type": "string" },
+        "alias": { "type": ["string", "null"] },
+        "importedSymbols": { "type": "array", "items": { "type": "string" } },
+        "kind": { "$ref": "#/$defs/importKind" },
+        "range": { "anyOf": [{ "$ref": "#/$defs/sourceRange" }, { "type": "null" }] },
+        "metadata": { "$ref": "#/$defs/analysisMetadata" }
+      },
+      "additionalProperties": false
+    },
+    "routeFact": {
+      "type": "object",
+      "required": [
+        "id",
+        "fileId",
+        "symbolId",
+        "serviceId",
+        "method",
+        "path",
+        "framework",
+        "range",
+        "metadata"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "fileId": { "type": ["string", "null"] },
+        "symbolId": { "type": ["string", "null"] },
+        "serviceId": { "type": ["string", "null"] },
+        "method": { "type": "string" },
+        "path": { "type": "string" },
+        "framework": { "type": ["string", "null"] },
+        "range": { "anyOf": [{ "$ref": "#/$defs/sourceRange" }, { "type": "null" }] },
+        "metadata": { "$ref": "#/$defs/analysisMetadata" }
+      },
+      "additionalProperties": false
+    },
+    "dataSourceKind": {
+      "enum": [
+        "request",
+        "database",
+        "cache",
+        "queue",
+        "file",
+        "network",
+        "environment",
+        "secret-store",
+        "unknown"
+      ]
+    },
+    "dataSourceFact": {
+      "type": "object",
+      "required": [
+        "id",
+        "fileId",
+        "symbolId",
+        "kind",
+        "name",
+        "endpoint",
+        "range",
+        "metadata"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "fileId": { "type": ["string", "null"] },
+        "symbolId": { "type": ["string", "null"] },
+        "kind": { "$ref": "#/$defs/dataSourceKind" },
+        "name": { "type": ["string", "null"] },
+        "endpoint": { "type": ["string", "null"] },
+        "range": { "anyOf": [{ "$ref": "#/$defs/sourceRange" }, { "type": "null" }] },
+        "metadata": { "$ref": "#/$defs/analysisMetadata" }
+      },
+      "additionalProperties": false
+    },
+    "sinkKind": {
+      "enum": [
+        "sql-query",
+        "command",
+        "http-response",
+        "log",
+        "template",
+        "file-write",
+        "network-request",
+        "redirect",
+        "deserialization",
+        "unknown"
+      ]
+    },
+    "sinkFact": {
+      "type": "object",
+      "required": ["id", "fileId", "symbolId", "kind", "name", "range", "metadata"],
+      "properties": {
+        "id": { "type": "string" },
+        "fileId": { "type": ["string", "null"] },
+        "symbolId": { "type": ["string", "null"] },
+        "kind": { "$ref": "#/$defs/sinkKind" },
+        "name": { "type": ["string", "null"] },
+        "range": { "anyOf": [{ "$ref": "#/$defs/sourceRange" }, { "type": "null" }] },
+        "metadata": { "$ref": "#/$defs/analysisMetadata" }
+      },
+      "additionalProperties": false
+    },
+    "sanitizerKind": {
+      "enum": [
+        "validation",
+        "encoding",
+        "escaping",
+        "parameterization",
+        "authentication",
+        "authorization",
+        "type-check",
+        "unknown"
+      ]
+    },
+    "sanitizerFact": {
+      "type": "object",
+      "required": ["id", "fileId", "symbolId", "kind", "name", "range", "metadata"],
+      "properties": {
+        "id": { "type": "string" },
+        "fileId": { "type": ["string", "null"] },
+        "symbolId": { "type": ["string", "null"] },
+        "kind": { "$ref": "#/$defs/sanitizerKind" },
+        "name": { "type": ["string", "null"] },
+        "range": { "anyOf": [{ "$ref": "#/$defs/sourceRange" }, { "type": "null" }] },
+        "metadata": { "$ref": "#/$defs/analysisMetadata" }
+      },
+      "additionalProperties": false
+    },
+    "apiSpecFormat": {
+      "enum": ["open-api", "async-api", "graphql", "grpc", "unknown"]
+    },
+    "apiSpecFact": {
+      "type": "object",
+      "required": ["id", "path", "format", "title", "version", "routeIds", "metadata"],
+      "properties": {
+        "id": { "type": "string" },
+        "path": { "type": "string" },
+        "format": { "$ref": "#/$defs/apiSpecFormat" },
+        "title": { "type": ["string", "null"] },
+        "version": { "type": ["string", "null"] },
+        "routeIds": { "type": "array", "items": { "type": "string" } },
+        "metadata": { "$ref": "#/$defs/analysisMetadata" }
+      },
+      "additionalProperties": false
+    },
+    "deploymentExposureKind": {
+      "enum": [
+        "public-http",
+        "private-http",
+        "message-consumer",
+        "scheduled-job",
+        "cli",
+        "unknown"
+      ]
+    },
+    "deploymentExposureFact": {
+      "type": "object",
+      "required": [
+        "id",
+        "serviceId",
+        "kind",
+        "path",
+        "port",
+        "protocol",
+        "public",
+        "metadata"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "serviceId": { "type": ["string", "null"] },
+        "kind": { "$ref": "#/$defs/deploymentExposureKind" },
+        "path": { "type": ["string", "null"] },
+        "port": { "type": ["integer", "null"], "minimum": 0, "maximum": 65535 },
+        "protocol": { "type": ["string", "null"] },
+        "public": { "type": "boolean" },
+        "metadata": { "$ref": "#/$defs/analysisMetadata" }
+      },
+      "additionalProperties": false
+    },
+    "taintEdgeKind": {
+      "enum": [
+        "source-to-call",
+        "call-to-call",
+        "call-to-sink",
+        "source-to-sink",
+        "sanitized",
+        "unknown"
+      ]
+    },
+    "taintEdge": {
+      "type": "object",
+      "required": [
+        "id",
+        "sourceId",
+        "targetId",
+        "sanitizerId",
+        "kind",
+        "confidence",
+        "metadata"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "sourceId": { "type": "string" },
+        "targetId": { "type": "string" },
+        "sanitizerId": { "type": ["string", "null"] },
+        "kind": { "$ref": "#/$defs/taintEdgeKind" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "metadata": { "$ref": "#/$defs/analysisMetadata" }
+      },
+      "additionalProperties": false
+    },
+    "analysisFacts": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "sourceFiles",
+        "symbols",
+        "calls",
+        "imports",
+        "routes",
+        "dataSources",
+        "sinks",
+        "sanitizers",
+        "apiSpecs",
+        "deploymentExposures",
+        "taintEdges",
+        "metadata"
+      ],
+      "properties": {
+        "schemaVersion": { "type": "string" },
+        "sourceFiles": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sourceFileFact" }
+        },
+        "symbols": { "type": "array", "items": { "$ref": "#/$defs/symbolFact" } },
+        "calls": { "type": "array", "items": { "$ref": "#/$defs/callFact" } },
+        "imports": { "type": "array", "items": { "$ref": "#/$defs/importFact" } },
+        "routes": { "type": "array", "items": { "$ref": "#/$defs/routeFact" } },
+        "dataSources": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/dataSourceFact" }
+        },
+        "sinks": { "type": "array", "items": { "$ref": "#/$defs/sinkFact" } },
+        "sanitizers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sanitizerFact" }
+        },
+        "apiSpecs": { "type": "array", "items": { "$ref": "#/$defs/apiSpecFact" } },
+        "deploymentExposures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/deploymentExposureFact" }
+        },
+        "taintEdges": { "type": "array", "items": { "$ref": "#/$defs/taintEdge" } },
+        "metadata": { "$ref": "#/$defs/analysisMetadata" }
+      },
+      "additionalProperties": false
+    },
+    "finding": {
+      "type": "object",
+      "required": [
+        "id",
+        "fingerprint",
+        "ruleId",
+        "tool",
+        "sourceTool",
+        "title",
+        "message",
+        "category",
+        "severity",
+        "confidence",
+        "service",
+        "language",
+        "framework",
+        "location",
+        "evidence",
+        "impact",
+        "remediation",
+        "fix",
+        "links",
+        "metadata"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "fingerprint": { "type": "string" },
+        "ruleId": { "type": "string" },
+        "tool": { "type": "string" },
+        "sourceTool": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "category": { "$ref": "#/$defs/category" },
+        "severity": { "$ref": "#/$defs/severity" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "service": { "type": ["string", "null"] },
+        "language": { "type": ["string", "null"] },
+        "framework": { "type": ["string", "null"] },
+        "location": {
+          "type": ["object", "null"],
+          "required": ["path", "line", "column", "endLine", "endColumn"],
+          "properties": {
+            "path": { "type": "string" },
+            "line": { "type": ["integer", "null"], "minimum": 1 },
+            "column": { "type": ["integer", "null"], "minimum": 1 },
+            "endLine": { "type": ["integer", "null"], "minimum": 1 },
+            "endColumn": { "type": ["integer", "null"], "minimum": 1 }
+          },
+          "additionalProperties": false
+        },
+        "evidence": {
+          "type": ["object", "null"],
+          "required": ["snippet", "redacted", "secretFingerprint"],
+          "properties": {
+            "snippet": { "type": "string" },
+            "redacted": { "type": "boolean" },
+            "secretFingerprint": { "type": ["string", "null"] }
+          },
+          "additionalProperties": false
+        },
+        "impact": { "type": ["string", "null"] },
+        "remediation": { "type": "string" },
+        "fix": {
+          "type": "object",
+          "required": ["available", "safety", "description"],
+          "properties": {
+            "available": { "type": "boolean" },
+            "safety": { "$ref": "#/$defs/fixSafety" },
+            "description": { "type": ["string", "null"] }
+          },
+          "additionalProperties": false
+        },
+        "links": { "type": "array", "items": { "type": "string" } },
+        "metadata": { "type": "object", "additionalProperties": { "type": "string" } },
+        "suppressed": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

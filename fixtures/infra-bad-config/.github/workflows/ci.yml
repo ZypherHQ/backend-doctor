@@ -1,0 +1,18 @@
+on:
+  pull_request_target:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-cache
+      - run: curl https://example.invalid/install.sh | sh
+      - run: echo ${{ secrets.DEPLOY_TOKEN }}
+      - run: kubectl apply -f k8s/

@@ -1,0 +1,13 @@
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      EXAMPLE_DATABASE_FILE: /run/runtime/example_db.txt
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    restart: "no"

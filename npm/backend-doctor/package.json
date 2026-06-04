@@ -1,0 +1,33 @@
+{
+  "name": "backend-doctor",
+  "version": "0.1.0",
+  "description": "npm command wrapper for Backend Doctor.",
+  "bin": {
+    "backend-doctor": "bin/backend-doctor.js"
+  },
+  "files": [
+    "README.md",
+    "bin/backend-doctor.js",
+    "bin/*/backend-doctor",
+    "bin/*/backend-doctor.exe",
+    "bin/*/SHA256SUMS",
+    "vendor/*/backend-doctor",
+    "vendor/*/backend-doctor.exe",
+    "vendor/*/SHA256SUMS",
+    "dist/*/backend-doctor",
+    "dist/*/backend-doctor.exe",
+    "dist/*/SHA256SUMS"
+  ],
+  "scripts": {
+    "stage:binaries": "../../scripts/release/stage-npm-package-binaries.sh",
+    "test": "npm run test:unit && npm run test:package",
+    "test:unit": "node test/package-metadata.test.js && node test/wrapper-checksum.test.js && node test/wrapper-smoke.test.js",
+    "test:package": "node test/packaged-tarball.test.js",
+    "pack:dry-run": "npm pack --dry-run",
+    "pack:check": "npm run test:package && npm pack --dry-run"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

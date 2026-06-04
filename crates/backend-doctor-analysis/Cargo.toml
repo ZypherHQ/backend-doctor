@@ -1,0 +1,24 @@
+[package]
+name = "backend-doctor-analysis"
+description.workspace = true
+edition.workspace = true
+keywords.workspace = true
+categories.workspace = true
+license.workspace = true
+readme.workspace = true
+version.workspace = true
+
+[dependencies]
+backend-doctor-core = { path = "../backend-doctor-core", version = "0.1.0" }
+serde.workspace = true
+tree-sitter = "0.26.8"
+tree-sitter-c-sharp = "0.23.5"
+tree-sitter-go = "0.25.0"
+tree-sitter-java = "0.23.5"
+tree-sitter-php = "0.24.2"
+tree-sitter-python = "0.25.0"
+tree-sitter-rust = "0.24.2"
+tree-sitter-typescript = "0.23.2"
+
+[dev-dependencies]
+serde_json.workspace = true

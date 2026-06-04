@@ -1,0 +1,15 @@
+{
+  "Results": [
+    {
+      "Target": "package-lock.json",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2026-0001",
+          "PkgName": "express",
+          "Severity": "HIGH",
+          "Title": "Fake high dependency issue"
+        }
+      ]
+    }
+  ]
+}

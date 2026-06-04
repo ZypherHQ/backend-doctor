@@ -1,0 +1,29 @@
+[package]
+name = "backend-doctor-cli"
+description.workspace = true
+edition.workspace = true
+keywords.workspace = true
+categories.workspace = true
+license.workspace = true
+readme.workspace = true
+version.workspace = true
+
+[[bin]]
+name = "backend-doctor"
+path = "src/main.rs"
+
+[dependencies]
+backend-doctor-analysis = { path = "../backend-doctor-analysis", version = "0.1.0" }
+backend-doctor-core = { path = "../backend-doctor-core", version = "0.1.0" }
+backend-doctor-detect = { path = "../backend-doctor-detect", version = "0.1.0" }
+backend-doctor-fix = { path = "../backend-doctor-fix", version = "0.1.0" }
+backend-doctor-plugin-api = { path = "../backend-doctor-plugin-api", version = "0.1.0" }
+backend-doctor-report = { path = "../backend-doctor-report", version = "0.1.0" }
+backend-doctor-rules = { path = "../backend-doctor-rules", version = "0.1.0" }
+chrono.workspace = true
+clap.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+clap.workspace = true
+jsonschema.workspace = true

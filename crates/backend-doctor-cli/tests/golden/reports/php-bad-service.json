@@ -1,0 +1,411 @@
+{
+  "schemaVersion": "1.0.0",
+  "toolVersion": "<tool-version>",
+  "startedAt": "<started-at>",
+  "durationMs": 0,
+  "root": "<workspace>/fixtures/php-bad-service",
+  "mode": "full",
+  "score": {
+    "value": 65,
+    "label": "Needs Work",
+    "categoryScores": [
+      {
+        "category": "architecture",
+        "score": 100
+      },
+      {
+        "category": "correctness",
+        "score": 100
+      },
+      {
+        "category": "dependencies",
+        "score": 100
+      },
+      {
+        "category": "infrastructure",
+        "score": 100
+      },
+      {
+        "category": "reliability",
+        "score": 100
+      },
+      {
+        "category": "security",
+        "score": 65
+      },
+      {
+        "category": "testing",
+        "score": 100
+      },
+      {
+        "category": "maintainability",
+        "score": 100
+      }
+    ],
+    "caps": []
+  },
+  "label": "Needs Work",
+  "categoryScores": [
+    {
+      "category": "architecture",
+      "score": 100
+    },
+    {
+      "category": "correctness",
+      "score": 100
+    },
+    {
+      "category": "dependencies",
+      "score": 100
+    },
+    {
+      "category": "infrastructure",
+      "score": 100
+    },
+    {
+      "category": "reliability",
+      "score": 100
+    },
+    {
+      "category": "security",
+      "score": 65
+    },
+    {
+      "category": "testing",
+      "score": 100
+    },
+    {
+      "category": "maintainability",
+      "score": 100
+    }
+  ],
+  "services": [
+    {
+      "id": ".",
+      "path": "<workspace>/fixtures/php-bad-service",
+      "languages": [
+        "PHP"
+      ],
+      "frameworks": [],
+      "metadata": {}
+    }
+  ],
+  "projectGraph": {
+    "root": "<workspace>/fixtures/php-bad-service",
+    "gitRoot": "<workspace>",
+    "workspaceRoot": "<workspace>",
+    "monorepo": false,
+    "services": [
+      {
+        "id": ".",
+        "path": "<workspace>/fixtures/php-bad-service",
+        "languages": [
+          "PHP"
+        ],
+        "frameworks": [],
+        "metadata": {}
+      }
+    ],
+    "languages": [
+      {
+        "name": "PHP",
+        "confidence": "high",
+        "evidence": [
+          "composer.json",
+          "public/index.php"
+        ]
+      }
+    ],
+    "inventory": {
+      "totalFiles": 2,
+      "sourceFiles": 1,
+      "manifestFiles": 1,
+      "infraFiles": 0,
+      "testFiles": 0,
+      "skippedBinaryFiles": 0,
+      "skippedLargeFiles": 0,
+      "files": [
+        "composer.json",
+        "public/index.php"
+      ]
+    },
+    "infra": {
+      "dockerfiles": [],
+      "composeFiles": [],
+      "kubernetesFiles": [],
+      "helmCharts": [],
+      "terraformFiles": [],
+      "githubActions": [],
+      "gitlabCi": [],
+      "openApiSpecs": [],
+      "migrationFiles": []
+    },
+    "diff": {
+      "enabled": false,
+      "base": null,
+      "fallbackFullScan": false,
+      "changedFiles": [],
+      "impactedFiles": []
+    },
+    "debug": {
+      "root": "<workspace>/fixtures/php-bad-service",
+      "gitRoot": "<workspace>",
+      "workspaceRoot": "<workspace>",
+      "ignoredPatterns": [
+        ".git",
+        ".hg",
+        ".svn",
+        "target",
+        "node_modules",
+        "build",
+        "dist",
+        ".next",
+        "coverage",
+        "vendor",
+        ".terraform"
+      ],
+      "warnings": [],
+      "decisions": [
+        "scan root <workspace>/fixtures/php-bad-service",
+        "inventory files=2 source=1 manifests=1 infra=0",
+        "services detected=1",
+        "languages detected=1",
+        "infra detected=false"
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "fnv64:1e35e1e1225d62c3",
+      "fingerprint": "fnv64:1e35e1e1225d62c3",
+      "ruleId": "php/pdo-query-string-concat",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-php",
+      "title": "PDO query uses string concatenation",
+      "message": "SQL query appears to concatenate request data.",
+      "category": "security",
+      "severity": "critical",
+      "confidence": "medium",
+      "service": ".",
+      "language": "PHP",
+      "framework": null,
+      "location": {
+        "path": "public/index.php",
+        "line": 5,
+        "column": 1,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "[REDACTED security evidence]",
+        "redacted": true,
+        "secretFingerprint": null
+      },
+      "impact": "Request data concatenated into SQL can become injection.",
+      "remediation": "Use prepared statements and bound parameters.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier2",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:5ea0475699e7e738"
+      }
+    },
+    {
+      "id": "fnv64:d517021061838644",
+      "fingerprint": "fnv64:d517021061838644",
+      "ruleId": "php/unserialize-user-input",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-php",
+      "title": "User input passed to unserialize",
+      "message": "Request input is passed to unserialize.",
+      "category": "security",
+      "severity": "critical",
+      "confidence": "high",
+      "service": ".",
+      "language": "PHP",
+      "framework": null,
+      "location": {
+        "path": "public/index.php",
+        "line": 7,
+        "column": 1,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "[REDACTED security evidence]",
+        "redacted": true,
+        "secretFingerprint": null
+      },
+      "impact": "Object injection can execute gadget chains.",
+      "remediation": "Use JSON or validate allowed classes before deserialization.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier2",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:f84bf8ea903366b6"
+      }
+    },
+    {
+      "id": "fnv64:d56d655283c7a98a",
+      "fingerprint": "fnv64:d56d655283c7a98a",
+      "ruleId": "php/shell-exec-user-input",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-php",
+      "title": "Shell execution uses request input",
+      "message": "Shell execution receives request input.",
+      "category": "security",
+      "severity": "critical",
+      "confidence": "high",
+      "service": ".",
+      "language": "PHP",
+      "framework": null,
+      "location": {
+        "path": "public/index.php",
+        "line": 8,
+        "column": 1,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "[REDACTED security evidence]",
+        "redacted": true,
+        "secretFingerprint": null
+      },
+      "impact": "Request data can become command injection.",
+      "remediation": "Avoid shell execution or pass allowlisted escaped arguments.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier2",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:4339df04d1f44131"
+      }
+    },
+    {
+      "id": "fnv64:8fc6b7fa4b6d342c",
+      "fingerprint": "fnv64:8fc6b7fa4b6d342c",
+      "ruleId": "php/display-errors-enabled",
+      "tool": "backend-doctor-rules",
+      "sourceTool": "builtin-php",
+      "title": "Display errors enabled",
+      "message": "display_errors is enabled.",
+      "category": "security",
+      "severity": "warning",
+      "confidence": "high",
+      "service": ".",
+      "language": "PHP",
+      "framework": null,
+      "location": {
+        "path": "public/index.php",
+        "line": 2,
+        "column": 1,
+        "endLine": null,
+        "endColumn": null
+      },
+      "evidence": {
+        "snippet": "ini_set('display_errors', '1');",
+        "redacted": false,
+        "secretFingerprint": null
+      },
+      "impact": "Runtime errors can leak implementation details.",
+      "remediation": "Disable display_errors in production and log server-side.",
+      "fix": {
+        "available": true,
+        "safety": "guided",
+        "description": null
+      },
+      "links": [],
+      "metadata": {
+        "coverageTier": "tier2",
+        "maturity": "language-specific",
+        "syntaxFingerprint": "fnv64:734325b94922fc30"
+      }
+    }
+  ],
+  "suppressedFindings": [],
+  "tools": [
+    {
+      "name": "backend-doctor-core",
+      "version": null,
+      "status": "ok"
+    }
+  ],
+  "externalToolVersions": [],
+  "externalToolExecutions": [],
+  "config": {
+    "includeGitignored": false,
+    "network": false,
+    "externalTools": {
+      "deep": false,
+      "runTests": false,
+      "scanHistory": false,
+      "installMissingTools": false,
+      "network": false,
+      "defaultTimeoutMs": 30000
+    },
+    "cache": {
+      "enabled": true,
+      "location": "repo-local",
+      "directory": null
+    },
+    "outputMode": "summary",
+    "thresholds": {
+      "minScore": 75,
+      "maxCritical": null,
+      "maxErrors": null
+    },
+    "disabledRules": [],
+    "rules": {},
+    "suppressions": []
+  },
+  "summary": {
+    "totalFindings": 4,
+    "suppressedFindings": 0,
+    "fixableFindings": 4,
+    "safeFixes": 0,
+    "criticalFindings": 3,
+    "errorFindings": 0
+  },
+  "slop": {
+    "index": 0,
+    "findings": 0,
+    "placeholderTests": 0,
+    "productionPlaceholders": 0,
+    "semanticCopyPaste": 0,
+    "spaghettiControlFlow": 0,
+    "swallowedErrors": 0
+  },
+  "coverage": {
+    "languages": [
+      {
+        "language": "PHP",
+        "tier": "tier2",
+        "maturity": "language-specific",
+        "ruleFamilies": [
+          "language-heuristics",
+          "backend-security",
+          "external-tool-hooks",
+          "security-generic",
+          "dependency-generic",
+          "infra-generic"
+        ],
+        "detectedFiles": 2,
+        "notes": "Tier 2 language-specific heuristic rules and gated external-tool hooks are enabled for this language."
+      }
+    ]
+  }
+}

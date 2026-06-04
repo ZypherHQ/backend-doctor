@@ -1,0 +1,6 @@
+{
+  "name": "backend-doctor/php-bad-service",
+  "require": {
+    "php": ">=8.2"
+  }
+}

@@ -1,0 +1,178 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  rust:
+    name: Rust workspace
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Install Rust
+        run: |
+          rustup toolchain install stable --profile minimal --component clippy rustfmt
+          rustup default stable
+      - name: Check Rust workspace presence
+        id: rust_workspace
+        run: |
+          if [ -f Cargo.toml ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "Cargo.toml is not present; Rust workspace checks are skipped."
+          fi
+      - name: cargo fmt
+        if: steps.rust_workspace.outputs.present == 'true'
+        run: cargo fmt --all --check
+      - name: cargo clippy
+        if: steps.rust_workspace.outputs.present == 'true'
+        run: cargo clippy --locked --workspace --all-targets -- -D warnings
+      - name: cargo test
+        if: steps.rust_workspace.outputs.present == 'true'
+        run: cargo test --locked --workspace
+      - name: report schema gate
+        if: steps.rust_workspace.outputs.present == 'true'
+        run: cargo test --locked -p backend-doctor-cli --test report_schema_gate fixture_json_reports_match_backend_doctor_schema -- --exact
+      - name: SARIF schema gate
+        if: steps.rust_workspace.outputs.present == 'true'
+        run: cargo test --locked -p backend-doctor-cli --test report_schema_gate fixture_sarif_reports_match_oasis_schema_and_github_shape -- --exact
+      - name: report performance smoke gate
+        if: steps.rust_workspace.outputs.present == 'true'
+        run: cargo test --locked -p backend-doctor-report tests::report_generation_and_rendering_perf_smoke_10000_findings -- --exact
+
+  node-wrapper:
+    name: npm wrapper
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+      - name: Test npm wrapper
+        working-directory: npm/backend-doctor
+        run: npm test --if-present
+
+  fixture-report-validation:
+    name: Fixture and report validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Install Rust
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+      - name: Generate fixture reports
+        run: |
+          set -euo pipefail
+
+          if [ -f Cargo.toml ] && [ -d fixtures ]; then
+            mkdir -p reports/backend-doctor
+            fixtures=(
+              fixtures/empty
+              fixtures/go-bad-service
+              fixtures/node-express-bad-service
+              fixtures/java-spring-bad-service
+              fixtures/python-bad-service
+              fixtures/csharp-bad-service
+              fixtures/php-bad-service
+              fixtures/rust-bad-service
+              fixtures/ruby-bad-service
+              fixtures/kotlin-bad-service
+              fixtures/scala-bad-service
+              fixtures/elixir-bad-service
+              fixtures/c-bad-service
+              fixtures/cpp-bad-service
+              fixtures/security-bad-service
+              fixtures/infra-bad-config
+              fixtures/polyglot-monorepo
+              fixtures/unsupported-language-bad-service
+            )
+
+            for fixture in "${fixtures[@]}"; do
+              if [ -d "$fixture" ]; then
+                name="${fixture#fixtures/}"
+                cargo run --locked -q -p backend-doctor-cli -- "$fixture" \
+                  --ci \
+                  --no-fail \
+                  --json-out "reports/backend-doctor/${name}.json" \
+                  --sarif "reports/backend-doctor/${name}.sarif"
+              fi
+            done
+          else
+            echo "Fixture/report validation skipped because Cargo.toml or fixtures/ is absent."
+          fi
+      - name: Validate generated JSON reports
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          reports=(reports/backend-doctor/*.json)
+          if [ "${#reports[@]}" -eq 0 ]; then
+            echo "::error::No backend-doctor JSON reports were generated."
+            exit 1
+          fi
+          for report in "${reports[@]}"; do
+            python3 -m json.tool "$report" >/dev/null
+          done
+          cargo test --locked -p backend-doctor-cli --test report_schema_gate fixture_json_reports_match_backend_doctor_schema -- --exact
+      - name: Validate SARIF readiness
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          sarif_reports=(reports/backend-doctor/*.sarif)
+          if [ "${#sarif_reports[@]}" -eq 0 ]; then
+            echo "::warning::No SARIF reports were generated. The upload step will activate after the Rust CLI writes --sarif output."
+          else
+          python3 - "${sarif_reports[@]}" <<'PY'
+          import json
+          import sys
+
+          seen = {}
+          for report_path in sys.argv[1:]:
+              with open(report_path, encoding="utf-8") as handle:
+                  sarif = json.load(handle)
+              runs = sarif.get("runs")
+              if not isinstance(runs, list) or not runs:
+                  print(f"::error file={report_path}::SARIF report must contain at least one run.")
+                  sys.exit(1)
+              for index, run in enumerate(runs):
+                  run_id = run.get("automationDetails", {}).get("id")
+                  if not isinstance(run_id, str) or not run_id.strip():
+                      print(f"::error file={report_path}::SARIF run {index} is missing automationDetails.id.")
+                      sys.exit(1)
+                  previous = seen.setdefault(run_id, f"{report_path} run {index}")
+                  if previous != f"{report_path} run {index}":
+                      print(
+                          f"::error file={report_path}::Duplicate SARIF automationDetails.id "
+                          f"{run_id!r}; already used by {previous}."
+                      )
+                      sys.exit(1)
+          PY
+          fi
+          cargo test --locked -p backend-doctor-cli --test report_schema_gate fixture_sarif_reports_match_oasis_schema_and_github_shape -- --exact
+      - name: Upload fixture reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: backend-doctor-fixture-reports
+          path: reports/backend-doctor/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Upload SARIF to code scanning
+        if: hashFiles('reports/backend-doctor/*.sarif') != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (github.event.repository.private == false || vars.BACKEND_DOCTOR_UPLOAD_SARIF == 'true')
+        uses: github/codeql-action/upload-sarif@7fd177fa680c9881b53cdab4d346d32574c9f7f4 # v3
+        with:
+          sarif_file: reports/backend-doctor/
+          category: backend-doctor

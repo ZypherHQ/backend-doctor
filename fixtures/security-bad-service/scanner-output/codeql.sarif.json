@@ -1,0 +1,23 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": { "driver": { "name": "CodeQL" } },
+      "results": [
+        {
+          "ruleId": "js/sql-injection",
+          "level": "error",
+          "message": { "text": "Fake SQL injection result" },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": { "uri": "src/app.ts" },
+                "region": { "startLine": 7, "startColumn": 3 }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

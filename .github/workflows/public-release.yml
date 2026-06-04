@@ -1,0 +1,743 @@
+name: Public Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "SemVer version to publish, without a leading v."
+        required: true
+        type: string
+      confirmation:
+        description: "Type exactly: publish backend-doctor <version> publicly"
+        required: true
+        type: string
+      release_notes_path:
+        description: "Repository path to release notes for this version."
+        required: true
+        type: string
+        default: "CHANGELOG.md"
+      homebrew_homepage:
+        description: "Public HTTPS homepage for the Homebrew formula."
+        required: true
+        type: string
+      homebrew_url_root:
+        description: "Public HTTPS release asset root used by the Homebrew formula."
+        required: true
+        type: string
+      npm_publish:
+        description: "Publish npm/backend-doctor with provenance."
+        required: true
+        type: boolean
+        default: false
+      docker_publish:
+        description: "Push Docker image with provenance and SBOM."
+        required: true
+        type: boolean
+        default: false
+      docker_image:
+        description: "Fully qualified Docker image name, for example ghcr.io/owner/backend-doctor."
+        required: false
+        type: string
+      docker_registry:
+        description: "Docker registry host. Use ghcr.io for GitHub Packages, or set matching secret names below."
+        required: false
+        type: string
+      docker_username_secret:
+        description: "Secret name containing the Docker registry username for non-GHCR registries."
+        required: false
+        type: string
+      docker_token_secret:
+        description: "Secret name containing the Docker registry token/password for non-GHCR registries."
+        required: false
+        type: string
+      sarif_upload:
+        description: "Generate and upload Backend Doctor SARIF to GitHub code scanning."
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-release-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  validate-release-request:
+    name: Validate guarded release request
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.validate.outputs.version }}
+      tag: ${{ steps.validate.outputs.tag }}
+      tag_sha: ${{ steps.validate.outputs.tag_sha }}
+      release_notes_path: ${{ steps.validate.outputs.release_notes_path }}
+      docker_image: ${{ steps.validate.outputs.docker_image }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Validate inputs
+        id: validate
+        shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+          RELEASE_NOTES_PATH: ${{ inputs.release_notes_path }}
+          HOMEBREW_HOMEPAGE: ${{ inputs.homebrew_homepage }}
+          HOMEBREW_URL_ROOT: ${{ inputs.homebrew_url_root }}
+          NPM_PUBLISH: ${{ inputs.npm_publish }}
+          DOCKER_PUBLISH: ${{ inputs.docker_publish }}
+          DOCKER_IMAGE: ${{ inputs.docker_image }}
+          DOCKER_REGISTRY: ${{ inputs.docker_registry }}
+          DOCKER_USERNAME_SECRET: ${{ inputs.docker_username_secret }}
+          DOCKER_TOKEN_SECRET: ${{ inputs.docker_token_secret }}
+          SARIF_UPLOAD: ${{ inputs.sarif_upload }}
+        run: |
+          set -euo pipefail
+
+          reject_control_chars() {
+            local name="$1"
+            local value="$2"
+            if printf '%s' "$value" | LC_ALL=C grep -q '[[:cntrl:]]'; then
+              echo "::error::${name} must not contain control characters or newlines."
+              exit 1
+            fi
+          }
+
+          require_nonempty() {
+            local name="$1"
+            local value="$2"
+            if [ -z "$value" ]; then
+              echo "::error::${name} must not be empty."
+              exit 1
+            fi
+          }
+
+          docker_host_from_image() {
+            local image="$1"
+            printf '%s' "${image%%/*}"
+          }
+
+          docker_host_without_port() {
+            local host="$1"
+            case "$host" in
+              \[*\]) printf '%s' "$host" ;;
+              *:*) printf '%s' "${host%%:*}" ;;
+              *) printf '%s' "$host" ;;
+            esac
+          }
+
+          is_private_or_local_docker_host() {
+            local host="$1"
+            local bare_host first_octet second_octet
+            bare_host="$(docker_host_without_port "$host")"
+            case "$bare_host" in
+              ""|"<"*|*">"*|*REPLACE_WITH*|*replace*|*PLACEHOLDER*|*placeholder*|example|example.*|*.example|*.example.*|localhost|*.localhost|0.0.0.0|127.*|*.local)
+                return 0
+                ;;
+            esac
+            if [[ "$bare_host" =~ ^10\.([0-9]{1,3}\.){2}[0-9]{1,3}$ ]]; then
+              return 0
+            fi
+            if [[ "$bare_host" =~ ^192\.168\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+              return 0
+            fi
+            if [[ "$bare_host" =~ ^172\.([0-9]{1,3})\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+              second_octet="${BASH_REMATCH[1]}"
+              if (( second_octet >= 16 && second_octet <= 31 )); then
+                return 0
+              fi
+            fi
+            if [[ "$bare_host" =~ ^169\.254\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+              return 0
+            fi
+            if [[ "$bare_host" =~ ^([0-9]{1,3})\.([0-9]{1,3})\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+              first_octet="${BASH_REMATCH[1]}"
+              second_octet="${BASH_REMATCH[2]}"
+              if (( first_octet == 100 && second_octet >= 64 && second_octet <= 127 )); then
+                return 0
+              fi
+            fi
+            return 1
+          }
+
+          reject_control_chars "version" "$VERSION"
+          reject_control_chars "confirmation" "$CONFIRMATION"
+          reject_control_chars "release_notes_path" "$RELEASE_NOTES_PATH"
+          reject_control_chars "homebrew_homepage" "$HOMEBREW_HOMEPAGE"
+          reject_control_chars "homebrew_url_root" "$HOMEBREW_URL_ROOT"
+          reject_control_chars "docker_image" "$DOCKER_IMAGE"
+          reject_control_chars "docker_registry" "$DOCKER_REGISTRY"
+          reject_control_chars "docker_username_secret" "$DOCKER_USERNAME_SECRET"
+          reject_control_chars "docker_token_secret" "$DOCKER_TOKEN_SECRET"
+
+          require_nonempty "version" "$VERSION"
+          require_nonempty "confirmation" "$CONFIRMATION"
+          require_nonempty "release_notes_path" "$RELEASE_NOTES_PATH"
+          require_nonempty "homebrew_homepage" "$HOMEBREW_HOMEPAGE"
+          require_nonempty "homebrew_url_root" "$HOMEBREW_URL_ROOT"
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::version must be SemVer without a leading v."
+            exit 1
+          fi
+
+          tag="v${VERSION}"
+          git fetch --force --depth=1 origin "refs/tags/${tag}:refs/tags/${tag}"
+          tag_sha="$(git rev-list -n 1 "$tag")"
+          if [ -z "$tag_sha" ]; then
+            echo "::error::release tag ${tag} did not resolve to a commit SHA."
+            exit 1
+          fi
+
+          expected="publish backend-doctor ${VERSION} publicly"
+          if [ "$CONFIRMATION" != "$expected" ]; then
+            echo "::error::confirmation must exactly match: ${expected}"
+            exit 1
+          fi
+
+          if [ "$(git cat-file -t "${tag_sha}:${RELEASE_NOTES_PATH}" 2>/dev/null || true)" != "blob" ]; then
+            echo "::error::release_notes_path must point to an existing repository file at ${tag}."
+            exit 1
+          fi
+
+          case "$RELEASE_NOTES_PATH" in
+            /*|*..*) echo "::error::release_notes_path must be a relative repository path without '..'."; exit 1 ;;
+          esac
+
+          case "$HOMEBREW_HOMEPAGE" in
+            https://*) ;;
+            *) echo "::error::homebrew_homepage must be an HTTPS URL."; exit 1 ;;
+          esac
+
+          case "$HOMEBREW_URL_ROOT" in
+            https://*) ;;
+            *) echo "::error::homebrew_url_root must be an HTTPS URL."; exit 1 ;;
+          esac
+
+          case "$HOMEBREW_HOMEPAGE $HOMEBREW_URL_ROOT" in
+            *REPLACE_WITH_OWNER*|*example.com*|*localhost*|*127.0.0.1*)
+              echo "::error::Homebrew public URLs must not be placeholders or local URLs."
+              exit 1
+              ;;
+          esac
+
+          if [ "$DOCKER_PUBLISH" = "true" ] && [ -z "$DOCKER_IMAGE" ]; then
+            echo "::error::docker_image is required when docker_publish is true."
+            exit 1
+          fi
+
+          if [ "$DOCKER_PUBLISH" = "true" ]; then
+            require_nonempty "docker_image" "$DOCKER_IMAGE"
+            require_nonempty "docker_registry" "$DOCKER_REGISTRY"
+
+            case "$DOCKER_IMAGE" in
+              */*) ;;
+              *) echo "::error::docker_image must include a namespace and image name."; exit 1 ;;
+            esac
+
+            if [[ ! "$DOCKER_IMAGE" =~ ^[a-z0-9]+([._:-][a-z0-9]+)*/[a-z0-9]+([._/-][a-z0-9]+)*$ ]]; then
+              echo "::error::docker_image must be a lowercase Docker image reference without a tag or digest."
+              exit 1
+            fi
+
+            docker_image_host="$(docker_host_from_image "$DOCKER_IMAGE")"
+            if is_private_or_local_docker_host "$docker_image_host"; then
+              echo "::error::docker_image must use a public registry host, not localhost, loopback, private IP, .local, or placeholder host."
+              exit 1
+            fi
+
+            case "$DOCKER_REGISTRY" in
+              *://*|*/*) echo "::error::docker_registry must be a registry host, not a URL or image path."; exit 1 ;;
+            esac
+
+            if [[ ! "$DOCKER_REGISTRY" =~ ^[A-Za-z0-9._:-]+$ ]]; then
+              echo "::error::docker_registry contains invalid characters."
+              exit 1
+            fi
+
+            if is_private_or_local_docker_host "$DOCKER_REGISTRY"; then
+              echo "::error::docker_registry must be a public registry host, not localhost, loopback, private IP, .local, or placeholder host."
+              exit 1
+            fi
+
+            case "$DOCKER_IMAGE" in
+              "$DOCKER_REGISTRY"/*) ;;
+              *) echo "::error::docker_image must start with docker_registry followed by '/'."; exit 1 ;;
+            esac
+
+            if [ "$DOCKER_REGISTRY" != "ghcr.io" ]; then
+              if [ -z "$DOCKER_USERNAME_SECRET" ] || [ -z "$DOCKER_TOKEN_SECRET" ]; then
+                echo "::error::docker_username_secret and docker_token_secret are required for non-GHCR registries."
+                exit 1
+              fi
+              if [[ ! "$DOCKER_USERNAME_SECRET" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || [[ ! "$DOCKER_TOKEN_SECRET" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+                echo "::error::Docker registry secret names must be valid GitHub Actions secret identifiers."
+                exit 1
+              fi
+            fi
+
+            case "$VERSION" in
+              *+*) echo "::error::Docker publish is enabled, but Docker tags cannot contain SemVer build metadata ('+')."; exit 1 ;;
+            esac
+          fi
+
+          if [ "$NPM_PUBLISH" != "true" ]; then
+            echo "::notice::npm_publish is false; npm provenance publish will be skipped."
+          fi
+          if [ "$DOCKER_PUBLISH" != "true" ]; then
+            echo "::notice::docker_publish is false; Docker push/provenance/SBOM will be skipped."
+          fi
+          if [ "$SARIF_UPLOAD" != "true" ]; then
+            echo "::notice::sarif_upload is false; hosted code scanning upload will be skipped."
+          fi
+
+          {
+            printf 'version=%s\n' "$VERSION"
+            printf 'tag=%s\n' "$tag"
+            printf 'tag_sha=%s\n' "$tag_sha"
+            printf 'release_notes_path=%s\n' "$RELEASE_NOTES_PATH"
+            printf 'docker_image=%s\n' "$DOCKER_IMAGE"
+          } >> "$GITHUB_OUTPUT"
+
+  release-gates:
+    name: Release gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: validate-release-request
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.validate-release-request.outputs.tag_sha }}
+      - name: Install Rust
+        shell: bash
+        run: |
+          rustup toolchain install stable --profile minimal --component clippy rustfmt
+          rustup default stable
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+      - name: Rust release gates
+        run: |
+          cargo fmt --all --check
+          cargo clippy --locked --workspace --all-targets -- -D warnings
+          cargo test --locked --workspace
+      - name: Report schema and performance gates
+        run: |
+          cargo test --locked -p backend-doctor-cli --test report_schema_gate fixture_json_reports_match_backend_doctor_schema -- --exact
+          cargo test --locked -p backend-doctor-cli --test report_schema_gate fixture_sarif_reports_match_oasis_schema_and_github_shape -- --exact
+          cargo test --locked -p backend-doctor-report tests::report_generation_and_rendering_perf_smoke_10000_findings -- --exact
+      - name: npm wrapper test and package dry run
+        working-directory: npm/backend-doctor
+        run: |
+          ../../scripts/release/build-local-binaries.sh
+          ../../scripts/release/stage-npm-package-binaries.sh
+          npm test --if-present
+          npm pack --dry-run
+
+  build-release-assets:
+    name: Build ${{ matrix.artifact }} release assets
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    needs:
+      - validate-release-request
+      - release-gates
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: linux-x64
+          - os: macos-latest
+            artifact: macos
+          - os: windows-latest
+            artifact: windows-x64
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.validate-release-request.outputs.tag_sha }}
+      - name: Install Rust
+        shell: bash
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+      - name: Build release binary and checksum
+        shell: bash
+        run: scripts/release/build-local-binaries.sh
+      - name: Upload platform release artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: backend-doctor-${{ matrix.artifact }}
+          path: dist/backend-doctor-*/
+          if-no-files-found: error
+          retention-days: 14
+
+  github-release:
+    name: Create GitHub release and attest assets
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs:
+      - validate-release-request
+      - build-release-assets
+    permissions:
+      contents: write
+      attestations: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.validate-release-request.outputs.tag_sha }}
+      - name: Download release artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: backend-doctor-*
+          path: dist/release-assets
+          merge-multiple: false
+      - name: Prepare GitHub release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/public-release
+          find dist/release-assets -type f \( -name 'backend-doctor' -o -name 'backend-doctor.exe' -o -name 'SHA256SUMS' \) -print0 |
+            while IFS= read -r -d '' file; do
+              parent="$(basename "$(dirname "$file")")"
+              case "$(basename "$file")" in
+                backend-doctor) cp "$file" "dist/public-release/${parent}-backend-doctor" ;;
+                backend-doctor.exe) cp "$file" "dist/public-release/${parent}-backend-doctor.exe" ;;
+                SHA256SUMS) cp "$file" "dist/public-release/${parent}-SHA256SUMS" ;;
+              esac
+            done
+
+          (
+            cd dist/public-release
+            rm -f SHA256SUMS
+            for asset in *; do
+              [ "$asset" = "SHA256SUMS" ] && continue
+              if command -v sha256sum >/dev/null 2>&1; then
+                sha256sum "$asset"
+              else
+                shasum -a 256 "$asset"
+              fi
+            done > SHA256SUMS
+          )
+      - name: Create release and upload assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.validate-release-request.outputs.tag }}
+          VERSION: ${{ needs.validate-release-request.outputs.version }}
+          RELEASE_NOTES_PATH: ${{ needs.validate-release-request.outputs.release_notes_path }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::error::Release ${TAG} already exists; inspect it before rerunning public release."
+            exit 1
+          fi
+          gh release create "$TAG" dist/public-release/* \
+            --title "backend-doctor ${VERSION}" \
+            --notes-file "$RELEASE_NOTES_PATH" \
+            --verify-tag
+      - name: Generate artifact attestations for release assets
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4
+        with:
+          subject-path: dist/public-release/*
+      - name: Upload release evidence artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: public-release-github-assets
+          path: dist/public-release/
+          if-no-files-found: error
+          retention-days: 90
+
+  npm-provenance-publish:
+    name: npm provenance publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs:
+      - validate-release-request
+      - github-release
+    if: ${{ inputs.npm_publish }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.validate-release-request.outputs.tag_sha }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+      - name: Download platform artifacts for npm package
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: backend-doctor-*
+          path: dist/npm-release-assets
+          merge-multiple: false
+      - name: Stage npm package binaries
+        run: scripts/release/stage-npm-package-binaries.sh dist/npm-release-assets
+      - name: Verify npm package before publish
+        working-directory: npm/backend-doctor
+        env:
+          EXPECTED_VERSION: ${{ needs.validate-release-request.outputs.version }}
+        run: |
+          actual_version="$(node -p "require('./package.json').version")"
+          if [ "$actual_version" != "$EXPECTED_VERSION" ]; then
+            echo "::error::npm package version ${actual_version} does not match release version ${EXPECTED_VERSION}."
+            exit 1
+          fi
+          npm test --if-present
+          npm pack --dry-run
+      - name: Publish npm package with provenance
+        working-directory: npm/backend-doctor
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
+
+  docker-provenance-publish:
+    name: Docker push with provenance and SBOM
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+      - validate-release-request
+      - github-release
+    if: ${{ inputs.docker_publish }}
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    outputs:
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.validate-release-request.outputs.tag_sha }}
+      - name: Log in to GHCR when publishing ghcr.io image
+        if: inputs.docker_registry == 'ghcr.io'
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Validate external Docker registry secrets
+        if: inputs.docker_registry != 'ghcr.io'
+        shell: bash
+        env:
+          DOCKER_USERNAME: ${{ secrets[inputs.docker_username_secret] }}
+          DOCKER_TOKEN: ${{ secrets[inputs.docker_token_secret] }}
+        run: |
+          set -euo pipefail
+          if [ -z "$DOCKER_USERNAME" ] || [ -z "$DOCKER_TOKEN" ]; then
+            echo "::error::Configured Docker registry secret names did not resolve to non-empty secrets."
+            exit 1
+          fi
+      - name: Log in to external Docker registry
+        if: inputs.docker_registry != 'ghcr.io'
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ inputs.docker_registry }}
+          username: ${{ secrets[inputs.docker_username_secret] }}
+          password: ${{ secrets[inputs.docker_token_secret] }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - name: Build and push image with provenance and SBOM
+        id: build
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ needs.validate-release-request.outputs.docker_image }}:${{ needs.validate-release-request.outputs.tag }}
+            ${{ needs.validate-release-request.outputs.docker_image }}:latest
+          provenance: true
+          sbom: true
+      - name: Attest pushed Docker image digest
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4
+        with:
+          subject-name: ${{ needs.validate-release-request.outputs.docker_image }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+
+  homebrew-formula-handoff:
+    name: Generate Homebrew formula handoff
+    runs-on: macos-latest
+    timeout-minutes: 20
+    needs:
+      - validate-release-request
+      - github-release
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.validate-release-request.outputs.tag_sha }}
+      - name: Install Rust
+        shell: bash
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+      - name: Generate hosted Homebrew formula candidate
+        shell: bash
+        env:
+          BACKEND_DOCTOR_VERSION: ${{ needs.validate-release-request.outputs.version }}
+          BACKEND_DOCTOR_HOMEBREW_HOMEPAGE: ${{ inputs.homebrew_homepage }}
+          BACKEND_DOCTOR_HOMEBREW_URL_ROOT: ${{ inputs.homebrew_url_root }}
+        run: scripts/release/generate-homebrew-formula.sh
+      - name: Run local Homebrew formula syntax/audit helper
+        shell: bash
+        run: scripts/release/test-homebrew-formula.sh
+      - name: Write Homebrew tap handoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "# Homebrew tap handoff"
+            echo
+            echo "- Formula candidate: dist/homebrew/backend-doctor.rb"
+            echo "- Run tap-specific audit/test on the target public tap before publishing."
+            echo "- Required external evidence: tap URL, formula URL, brew audit output, and brew test or test-bot output."
+          } > dist/homebrew/HOMEBREW_TAP_HANDOFF.md
+      - name: Upload Homebrew handoff artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: public-release-homebrew-handoff
+          path: dist/homebrew/
+          if-no-files-found: error
+          retention-days: 90
+
+  hosted-sarif-upload:
+    name: Hosted SARIF upload validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs:
+      - validate-release-request
+      - github-release
+    if: ${{ inputs.sarif_upload }}
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.validate-release-request.outputs.tag_sha }}
+      - name: Install Rust
+        shell: bash
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+      - name: Generate Backend Doctor SARIF
+        run: |
+          set -euo pipefail
+          mkdir -p reports/backend-doctor
+          cargo run --locked -q -p backend-doctor-cli -- fixtures/polyglot-monorepo \
+            --ci \
+            --no-fail \
+            --json-out reports/backend-doctor/public-release.json \
+            --sarif reports/backend-doctor/public-release.sarif
+          cargo test --locked -p backend-doctor-cli --test report_schema_gate fixture_sarif_reports_match_oasis_schema_and_github_shape -- --exact
+      - name: Upload SARIF to code scanning
+        uses: github/codeql-action/upload-sarif@7fd177fa680c9881b53cdab4d346d32574c9f7f4 # v3
+        with:
+          sarif_file: reports/backend-doctor/public-release.sarif
+          category: backend-doctor-public-release
+      - name: Upload SARIF evidence artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: public-release-sarif-evidence
+          path: reports/backend-doctor/
+          if-no-files-found: error
+          retention-days: 90
+
+  evidence-summary:
+    name: Emit release evidence summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs:
+      - validate-release-request
+      - github-release
+      - npm-provenance-publish
+      - docker-provenance-publish
+      - homebrew-formula-handoff
+      - hosted-sarif-upload
+    if: always() && needs.validate-release-request.result == 'success' && needs.github-release.result == 'success'
+    steps:
+      - name: Write public release evidence summary
+        shell: bash
+        env:
+          VERSION: ${{ needs.validate-release-request.outputs.version }}
+          TAG: ${{ needs.validate-release-request.outputs.tag }}
+          DOCKER_IMAGE: ${{ needs.validate-release-request.outputs.docker_image }}
+          DOCKER_DIGEST: ${{ needs.docker-provenance-publish.outputs.image_digest }}
+          NPM_RESULT: ${{ needs.npm-provenance-publish.result }}
+          DOCKER_RESULT: ${{ needs.docker-provenance-publish.result }}
+          HOMEBREW_RESULT: ${{ needs.homebrew-formula-handoff.result }}
+          SARIF_RESULT: ${{ needs.hosted-sarif-upload.result }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p public-release-evidence
+          release_url="https://github.com/${REPOSITORY}/releases/tag/${TAG}"
+          release_download_root="https://github.com/${REPOSITORY}/releases/download/${TAG}"
+          workflow_run_url="https://github.com/${REPOSITORY}/actions/runs/${RUN_ID}"
+          code_scanning_url="https://github.com/${REPOSITORY}/security/code-scanning"
+          {
+            echo "# Backend Doctor public release handoff checklist"
+            echo
+            echo "This artifact is non-validating. It is a release-owner handoff checklist generated from workflow context, not proof that P0 public release evidence passes."
+            echo
+            echo "Copy verified public evidence into .orchestration/p0-public-release-evidence-template.md and run:"
+            echo
+            echo '```bash'
+            echo ".orchestration/validate-p0-release-evidence.sh .orchestration/p0-public-release-evidence-template.md"
+            echo '```'
+            echo
+            echo "Keep public readiness blocked until that validator passes with hosted public evidence."
+            echo
+            echo "## Workflow-context URLs"
+            echo
+            echo "| Evidence item | Value | Validation status |"
+            echo "| --- | --- | --- |"
+            echo "| Release version | ${VERSION} | Context only; verify against package registries and artifacts. |"
+            echo "| Release tag | ${TAG} | Context only; validator requires v-prefixed release tag evidence. |"
+            echo "| GitHub release URL | ${release_url} | Verify release exists and assets are public. |"
+            echo "| Binary asset URL pattern | ${release_download_root}/<asset-name> | TODO(external): replace with exact public asset URLs and checksum proof. |"
+            echo "| Checksum asset URL pattern | ${release_download_root}/SHA256SUMS | TODO(external): verify public download and checksum command output. |"
+            echo "| Workflow run URL | ${workflow_run_url} | Context only; inspect job conclusions and permissions. |"
+            echo "| Code scanning URL | ${code_scanning_url} | TODO(external): verify uploaded SARIF result is visible. |"
+            echo "| npm publish job result | ${NPM_RESULT} | TODO(external): record npm package URL, provenance/statement URL, and clean install output. |"
+            echo "| Docker publish job result | ${DOCKER_RESULT} | TODO(external): record registry URL, v-prefixed tag pull/run output, digest, provenance, SBOM, and attestation evidence. |"
+            echo "| Homebrew handoff job result | ${HOMEBREW_RESULT} | TODO(external): record public tap/formula URL plus audit, test, and build-from-source install output. |"
+            echo "| Hosted SARIF upload job result | ${SARIF_RESULT} | TODO(external): record workflow URL, category, code-scanning URL, and security-events: write evidence. |"
+            echo
+            echo "## External evidence still required"
+            echo
+            echo "| Required evidence | Where to record it |"
+            echo "| --- | --- |"
+            echo "| GitHub release assets, exact binary URLs, checksum URL, checksum verification output, and binary attestation proof | .orchestration/p0-public-release-evidence-template.md |"
+            echo "| npm package URL, published version, provenance evidence, publish command/workflow step, clean install command, and clean install output | .orchestration/p0-public-release-evidence-template.md |"
+            echo "| Cargo/crates.io package URL/version, publish readiness, internal crate release order, yank/ownership policy, and clean default-registry cargo install output | .orchestration/p0-public-release-evidence-template.md |"
+            echo "| Docker registry/image URL, ${TAG} tag, immutable digest, Buildx provenance, SBOM, image attestation, clean pull command, and clean run output | .orchestration/p0-public-release-evidence-template.md |"
+            echo "| Homebrew tap URL, formula URL/artifact URL, formula sha256, strict audit output, test/test-bot output, and build-from-source install output | .orchestration/p0-public-release-evidence-template.md |"
+            echo "| Hosted SARIF workflow URL, uploaded category, code scanning URL or screenshot reference, and security-events: write permission proof | .orchestration/p0-public-release-evidence-template.md |"
+            echo "| Clean public runtime checks for npm, Docker, binary, JSON output, SARIF output, human TTY output, and remediation preview | .orchestration/p0-public-release-evidence-template.md |"
+            echo "| Privacy/telemetry confirmation and final P0 decision evidence | .orchestration/p0-public-release-evidence-template.md |"
+            echo
+            echo "## Optional Docker context from this run"
+            echo
+            if [ -n "$DOCKER_IMAGE" ]; then
+              echo "- Docker image: ${DOCKER_IMAGE}"
+              echo "- Docker version tag expected by validator: ${DOCKER_IMAGE}:${TAG}"
+              echo "- Docker latest tag retained: ${DOCKER_IMAGE}:latest"
+            fi
+            if [ -n "$DOCKER_DIGEST" ]; then
+              echo "- Docker digest from Buildx output: ${DOCKER_DIGEST}"
+            fi
+            echo
+            echo "This checklist intentionally contains TODO(external) rows and must not be treated as passing evidence."
+          } > public-release-evidence/summary.md
+      - name: Upload public release evidence summary
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: public-release-evidence-summary
+          path: public-release-evidence/
+          if-no-files-found: error
+          retention-days: 90

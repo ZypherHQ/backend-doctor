@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: example/api:latest
+          securityContext:
+            privileged: true
+          env:
+            - name: API_TOKEN
+              value: bd_fixture_k8s_token_123456
+          ports:
+            - containerPort: 3000
