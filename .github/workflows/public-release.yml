@@ -461,7 +461,7 @@ jobs:
           retention-days: 90
 
   npm-provenance-publish:
-    name: npm provenance publish
+    name: npm publish
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs:
@@ -501,11 +501,11 @@ jobs:
           fi
           npm test --if-present
           npm pack --dry-run
-      - name: Publish npm package with provenance
+      - name: Publish npm package
         working-directory: npm/backend-doctor
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --provenance --access public
+        run: npm publish --access public
 
   docker-provenance-publish:
     name: Docker push with provenance and SBOM

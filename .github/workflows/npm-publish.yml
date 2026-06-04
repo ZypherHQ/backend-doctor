@@ -1,0 +1,112 @@
+name: npm Publish
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-publish-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  build-platform-binaries:
+    name: Build ${{ matrix.artifact }} npm binary
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: linux-x64
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-24.04-arm
+            artifact: linux-arm64
+            target: aarch64-unknown-linux-gnu
+          - os: macos-15-intel
+            artifact: macos-x64
+            target: x86_64-apple-darwin
+          - os: macos-15
+            artifact: macos-arm64
+            target: aarch64-apple-darwin
+          - os: windows-latest
+            artifact: windows-x64
+            target: x86_64-pc-windows-msvc
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Install Rust
+        shell: bash
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+          rustup target add "${{ matrix.target }}"
+      - name: Build CLI binary and checksum
+        shell: bash
+        env:
+          BACKEND_DOCTOR_TARGET: ${{ matrix.target }}
+        run: scripts/release/build-local-binaries.sh
+      - name: Upload platform artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: backend-doctor-${{ matrix.artifact }}
+          path: dist/backend-doctor-*/
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-npm:
+    name: Publish npm package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build-platform-binaries
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+      - name: Download platform artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: backend-doctor-*
+          path: dist/npm-release-assets
+          merge-multiple: false
+      - name: Stage npm package binaries
+        env:
+          BACKEND_DOCTOR_REQUIRED_NPM_TARGETS: x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu x86_64-apple-darwin aarch64-apple-darwin x86_64-pc-windows-msvc
+        run: scripts/release/stage-npm-package-binaries.sh dist/npm-release-assets
+      - name: Verify npm package
+        working-directory: npm/backend-doctor
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+
+          version="${TAG_NAME#v}"
+          actual_version="$(node -p "require('./package.json').version")"
+          if [ "$actual_version" != "$version" ]; then
+            echo "::error::npm package version ${actual_version} does not match tag ${TAG_NAME}."
+            exit 1
+          fi
+
+          if npm view "backend-doctor@${version}" version >/dev/null 2>&1; then
+            echo "::error::backend-doctor@${version} is already published to npm."
+            exit 1
+          fi
+
+          npm test --if-present
+          npm pack --dry-run
+      - name: Publish npm package
+        working-directory: npm/backend-doctor
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "::error::Repository secret NPM_TOKEN is required to publish backend-doctor."
+            exit 1
+          fi
+          npm publish --access public
