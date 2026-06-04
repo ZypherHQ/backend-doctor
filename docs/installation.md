@@ -2,20 +2,20 @@
 
 Backend Doctor ships as a single `backend-doctor` binary. There are four ways to run it.
 
-## 1. npm (recommended once published)
+## 1. npm (recommended)
 
 Requires **Node ≥ 18**. The npm package is a thin wrapper that runs a packaged platform binary.
 
 ```bash
-# Run without installing
-npx -y @zypherhq/backend-doctor@latest .
-
-# Or install it
 npm install -g @zypherhq/backend-doctor
 backend-doctor .
 ```
 
-> The public package is published when `npm view @zypherhq/backend-doctor version` succeeds. Until then, use one of the local methods below.
+Check the published version with:
+
+```bash
+npm view @zypherhq/backend-doctor version
+```
 
 Supported npm binaries:
 

@@ -48,8 +48,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Backend Doctor
+        run: npm install -g @zypherhq/backend-doctor@latest
+
       - name: Run Backend Doctor
-        run: npx -y @zypherhq/backend-doctor@latest . \
+        run: backend-doctor . \
                --ci --min-score 80 --max-critical 0 \
                --github-annotations \
                --sarif backend-doctor.sarif
