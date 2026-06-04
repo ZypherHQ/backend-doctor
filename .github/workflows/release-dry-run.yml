@@ -3,8 +3,19 @@ name: Release Dry Run
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     tags:
       - "v*"
+    paths:
+      - ".github/workflows/release-dry-run.yml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "crates/**"
+      - "Dockerfile"
+      - ".dockerignore"
+      - "packaging/**"
+      - "scripts/release/**"
+      - "npm/backend-doctor/**"
   pull_request:
     paths:
       - ".github/workflows/release-dry-run.yml"
