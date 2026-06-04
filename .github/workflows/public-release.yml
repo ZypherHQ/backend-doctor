@@ -15,7 +15,7 @@ on:
         description: "Repository path to release notes for this version."
         required: true
         type: string
-        default: "CHANGELOG.md"
+        default: "README.md"
       homebrew_homepage:
         description: "Public HTTPS homepage for the Homebrew formula."
         required: true
@@ -348,10 +348,19 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact: linux-x64
-          - os: macos-latest
-            artifact: macos
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-24.04-arm
+            artifact: linux-arm64
+            target: aarch64-unknown-linux-gnu
+          - os: macos-15-intel
+            artifact: macos-x64
+            target: x86_64-apple-darwin
+          - os: macos-15
+            artifact: macos-arm64
+            target: aarch64-apple-darwin
           - os: windows-latest
             artifact: windows-x64
+            target: x86_64-pc-windows-msvc
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
@@ -361,8 +370,11 @@ jobs:
         run: |
           rustup toolchain install stable --profile minimal
           rustup default stable
+          rustup target add "${{ matrix.target }}"
       - name: Build release binary and checksum
         shell: bash
+        env:
+          BACKEND_DOCTOR_TARGET: ${{ matrix.target }}
         run: scripts/release/build-local-binaries.sh
       - name: Upload platform release artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -474,6 +486,8 @@ jobs:
           path: dist/npm-release-assets
           merge-multiple: false
       - name: Stage npm package binaries
+        env:
+          BACKEND_DOCTOR_REQUIRED_NPM_TARGETS: x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu x86_64-apple-darwin aarch64-apple-darwin x86_64-pc-windows-msvc
         run: scripts/release/stage-npm-package-binaries.sh dist/npm-release-assets
       - name: Verify npm package before publish
         working-directory: npm/backend-doctor

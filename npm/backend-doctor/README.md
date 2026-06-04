@@ -8,6 +8,14 @@ Expected user command after public npm publication is complete and `npm view bac
 npx -y backend-doctor@latest .
 ```
 
+Supported published binaries:
+
+- Linux x64: `x86_64-unknown-linux-gnu`
+- Linux ARM64: `aarch64-unknown-linux-gnu`
+- macOS Intel: `x86_64-apple-darwin`
+- macOS Apple Silicon: `aarch64-apple-darwin`
+- Windows x64: `x86_64-pc-windows-msvc`
+
 Current local-development behavior:
 
 - forwards all arguments to a packaged `backend-doctor` binary when one is included under `bin/<platform>/`, `vendor/<platform>/`, or `dist/<platform>/`;

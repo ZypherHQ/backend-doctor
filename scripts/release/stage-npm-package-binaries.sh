@@ -15,6 +15,32 @@ declare -a artifact_dirs=()
 declare -a artifact_targets=()
 declare -a artifact_binaries=()
 
+require_target() {
+  local required_target="$1"
+  local existing_target
+
+  for existing_target in "${artifact_targets[@]}"; do
+    if [ "$existing_target" = "$required_target" ]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+print_staged_targets() {
+  local target
+
+  if [ "${#artifact_targets[@]}" -eq 0 ]; then
+    printf '(none)'
+    return
+  fi
+
+  for target in "${artifact_targets[@]}"; do
+    printf '%s ' "$target"
+  done
+}
+
 verify_checksum() {
   local dir="$1"
 
@@ -74,6 +100,16 @@ if [ "${#artifact_dirs[@]}" -eq 0 ]; then
   echo "backend-doctor npm staging found no verified release binaries under $source_root" >&2
   exit 1
 fi
+
+for required_target in ${BACKEND_DOCTOR_REQUIRED_NPM_TARGETS:-}; do
+  if ! require_target "$required_target"; then
+    echo "backend-doctor npm staging missing required target $required_target" >&2
+    printf 'backend-doctor npm staging found targets: ' >&2
+    print_staged_targets >&2
+    printf '\n' >&2
+    exit 1
+  fi
+done
 
 rm -rf "$destination_root"
 mkdir -p "$destination_root"

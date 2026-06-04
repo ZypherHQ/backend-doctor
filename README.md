@@ -62,7 +62,7 @@ The default scan streams live progress, then prints detection checkmarks, groupe
 - `ci/curl-pipe-shell`, `ci/github-action-unpinned`, `ci/secrets-printed`
 - `agent/placeholder-test`, `agent/swallowed-error`, `agent/spaghetti-control-flow`
 
-Browse the whole catalogue in [docs/rules.md](docs/rules.md) and [RULE_REGISTRY.md](RULE_REGISTRY.md). Explain any rule or location:
+Browse the rule catalogue in [docs/rules.md](docs/rules.md). Explain any rule or location:
 
 ```bash
 cargo run -q -p backend-doctor-cli -- . explain go/http-client-no-timeout
@@ -75,7 +75,7 @@ cargo run -q -p backend-doctor-cli -- . explain src/server.go:42
 
 | Method | Command | Notes |
 | --- | --- | --- |
-| npm (after publish) | `npx -y backend-doctor@latest .` | Node ≥ 18; downloads platform binary |
+| npm (after publish) | `npx -y backend-doctor@latest .` | Node ≥ 18; downloads the matching Linux, macOS, or Windows binary |
 | From source | `cargo run -q -p backend-doctor-cli -- .` | Needs the Rust toolchain |
 | Local npm wrapper | `node npm/backend-doctor/bin/backend-doctor.js .` | Wrapper used during development |
 | Docker | `docker build -t backend-doctor . && docker run --rm -v "$PWD":/work backend-doctor /work` | Entry point is `backend-doctor` |
@@ -136,8 +136,6 @@ All guides live in [`docs/`](docs/):
 - [Architecture](docs/architecture.md) — crate workspace and building from source
 - [Privacy & security](docs/privacy-security.md) — local-by-default and redaction
 
-Repository-level references: [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md), [RULE_REGISTRY.md](RULE_REGISTRY.md), [SECURITY.md](SECURITY.md), [CHANGELOG.md](CHANGELOG.md).
-
 ---
 
 ## Project layout
@@ -164,7 +162,7 @@ skills/backend-doctor/  agent skill definition
 
 ## Status
 
-Local release candidate. The Rust CLI, npm wrapper, stack detection, scoring, JSON/SARIF output, CI mode, diff/deep cache, and safe/guided autofix are implemented and verified locally. Tier 1 (Go, Node/TypeScript, Java, security, infrastructure, API/OpenAPI, agent-slop) rules are the most mature; Tier 2 (Python, C#/.NET, PHP, Rust) and Tier 3 (Ruby, Kotlin, Scala, Elixir, C, C++) have fixture-backed integrations that are intentionally shallow. Public npm publishing and hosted binary distribution require release credentials. See [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
+Local release candidate. The Rust CLI, npm wrapper, stack detection, scoring, JSON/SARIF output, CI mode, diff/deep cache, and safe/guided autofix are implemented and verified locally. Tier 1 (Go, Node/TypeScript, Java, security, infrastructure, API/OpenAPI, agent-slop) rules are the most mature; Tier 2 (Python, C#/.NET, PHP, Rust) and Tier 3 (Ruby, Kotlin, Scala, Elixir, C, C++) have fixture-backed integrations that are intentionally shallow. Public npm publishing and hosted binary distribution require release credentials.
 
 ---
 

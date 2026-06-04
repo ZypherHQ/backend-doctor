@@ -17,6 +17,14 @@ backend-doctor .
 
 > The public package is published when `npm view backend-doctor version` succeeds. Until then, use one of the local methods below.
 
+Supported npm binaries:
+
+- Linux x64: `x86_64-unknown-linux-gnu`
+- Linux ARM64: `aarch64-unknown-linux-gnu`
+- macOS Intel: `x86_64-apple-darwin`
+- macOS Apple Silicon: `aarch64-apple-darwin`
+- Windows x64: `x86_64-pc-windows-msvc`
+
 ### How the wrapper resolves a binary
 
 `npm/backend-doctor/bin/backend-doctor.js` forwards all arguments to the first thing it finds:
@@ -68,7 +76,7 @@ docker run --rm -v "$PWD":/work backend-doctor /work --json
 
 ## 4. Homebrew
 
-A Homebrew formula is generated as part of the release process (see `dist/homebrew/`). Formula audit needs a macOS/Ruby/Homebrew environment; consult [`RELEASE_RUNBOOK.md`](../RELEASE_RUNBOOK.md) for the publishing steps.
+A Homebrew formula can be generated as part of the release process (see `dist/homebrew/`). Formula audit needs a macOS/Ruby/Homebrew environment.
 
 ## Verifying the install
 
