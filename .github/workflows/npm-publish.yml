@@ -110,4 +110,4 @@ jobs:
             echo "::error::NPM_TOKEN secret is required in the repository or npm-publish environment."
             exit 1
           fi
-          npm publish --access public
+          npm publish
