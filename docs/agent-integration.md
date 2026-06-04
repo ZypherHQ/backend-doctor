@@ -18,7 +18,7 @@ The skill prefers verified workflows, in order:
 
 ```bash
 # Published package (once npm publish is real)
-npx --yes backend-doctor@latest <PROJECT> --deep --no-fail
+npx --yes @zypherhq/backend-doctor@latest <PROJECT> --deep --no-fail
 
 # From source
 cargo run -q -p backend-doctor-cli -- <PROJECT> --deep --no-fail

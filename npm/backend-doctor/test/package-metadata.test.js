@@ -11,6 +11,7 @@ const workspaceManifest = fs.readFileSync(path.join(packageRoot, '..', '..', 'Ca
 const workspaceVersion = workspaceManifest.match(/\[workspace\.package\][\s\S]*?\nversion = "([^"]+)"/)?.[1];
 
 assert.equal(manifest.private, undefined, 'package must not be marked private for release dry-runs');
+assert.equal(manifest.name, '@zypherhq/backend-doctor', 'npm package name should use the publishable ZypherHQ scope');
 assert.equal(manifest.license, 'MIT', 'npm package license should match the Rust workspace license');
 assert.equal(manifest.version, workspaceVersion, 'npm package version should match the Rust workspace version');
 assert.equal(manifest.bin['backend-doctor'], 'bin/backend-doctor.js', 'CLI bin mapping should stay stable');

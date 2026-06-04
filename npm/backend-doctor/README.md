@@ -2,10 +2,10 @@
 
 This package is the npm command wrapper for Backend Doctor.
 
-Expected user command after public npm publication is complete and `npm view backend-doctor version` succeeds:
+Expected user command after public npm publication is complete and `npm view @zypherhq/backend-doctor version` succeeds:
 
 ```bash
-npx -y backend-doctor@latest .
+npx -y @zypherhq/backend-doctor@latest .
 ```
 
 Supported published binaries:

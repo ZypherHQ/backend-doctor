@@ -49,7 +49,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run Backend Doctor
-        run: npx -y backend-doctor@latest . \
+        run: npx -y @zypherhq/backend-doctor@latest . \
                --ci --min-score 80 --max-critical 0 \
                --github-annotations \
                --sarif backend-doctor.sarif

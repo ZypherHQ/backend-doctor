@@ -1,6 +1,6 @@
 # Getting Started
 
-This walks through a first scan and how to read the result. Commands use the source form (`cargo run …`); substitute `backend-doctor` or `npx -y backend-doctor@latest` if you installed it another way (see [Installation](installation.md)).
+This walks through a first scan and how to read the result. Commands use the source form (`cargo run ...`); substitute `backend-doctor` or `npx -y @zypherhq/backend-doctor@latest` if you installed it another way (see [Installation](installation.md)).
 
 ## 1. Scan a project
 

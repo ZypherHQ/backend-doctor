@@ -28,7 +28,7 @@ It runs **locally by default** and does not upload your source, findings, or sec
 Once the package is published, the fastest path is npm:
 
 ```bash
-npx -y backend-doctor@latest .
+npx -y @zypherhq/backend-doctor@latest .
 ```
 
 Working from source in this repository:
@@ -75,7 +75,7 @@ cargo run -q -p backend-doctor-cli -- . explain src/server.go:42
 
 | Method | Command | Notes |
 | --- | --- | --- |
-| npm (after publish) | `npx -y backend-doctor@latest .` | Node ≥ 18; downloads the matching Linux, macOS, or Windows binary |
+| npm (after publish) | `npx -y @zypherhq/backend-doctor@latest .` | Node ≥ 18; downloads the matching Linux, macOS, or Windows binary |
 | From source | `cargo run -q -p backend-doctor-cli -- .` | Needs the Rust toolchain |
 | Local npm wrapper | `node npm/backend-doctor/bin/backend-doctor.js .` | Wrapper used during development |
 | Docker | `docker build -t backend-doctor . && docker run --rm -v "$PWD":/work backend-doctor /work` | Entry point is `backend-doctor` |

@@ -1,5 +1,5 @@
 {
-  "name": "backend-doctor",
+  "name": "@zypherhq/backend-doctor",
   "version": "0.1.0",
   "description": "npm command wrapper for Backend Doctor.",
   "bin": {

@@ -8,14 +8,14 @@ Requires **Node ≥ 18**. The npm package is a thin wrapper that runs a packaged
 
 ```bash
 # Run without installing
-npx -y backend-doctor@latest .
+npx -y @zypherhq/backend-doctor@latest .
 
 # Or install it
-npm install -g backend-doctor
+npm install -g @zypherhq/backend-doctor
 backend-doctor .
 ```
 
-> The public package is published when `npm view backend-doctor version` succeeds. Until then, use one of the local methods below.
+> The public package is published when `npm view @zypherhq/backend-doctor version` succeeds. Until then, use one of the local methods below.
 
 Supported npm binaries:
 

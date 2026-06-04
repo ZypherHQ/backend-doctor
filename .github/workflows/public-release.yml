@@ -506,7 +506,7 @@ jobs:
         working-directory: npm/backend-doctor
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish
+        run: npm publish --access public
 
   docker-provenance-publish:
     name: Docker push with provenance and SBOM
