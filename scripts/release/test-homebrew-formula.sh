@@ -17,4 +17,4 @@ if ! command -v brew >/dev/null 2>&1; then
   exit 0
 fi
 
-brew audit --formula --strict --online=false "$formula"
+brew audit --formula --strict "$formula"

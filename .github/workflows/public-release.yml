@@ -464,6 +464,7 @@ jobs:
     name: npm publish
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    environment: npm-publish
     needs:
       - validate-release-request
       - github-release

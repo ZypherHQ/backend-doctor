@@ -61,6 +61,7 @@ jobs:
     name: Publish npm package
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    environment: npm-publish
     needs: build-platform-binaries
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -106,7 +107,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
-            echo "::error::Repository secret NPM_TOKEN is required to publish backend-doctor."
+            echo "::error::NPM_TOKEN secret is required in the repository or npm-publish environment."
             exit 1
           fi
           npm publish --access public
