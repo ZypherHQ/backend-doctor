@@ -97,9 +97,9 @@ jobs:
 
           cd ../../dist/npm
           if command -v sha256sum >/dev/null 2>&1; then
-            sha256sum *.tgz > SHA256SUMS
+            sha256sum ./*.tgz > SHA256SUMS
           else
-            shasum -a 256 *.tgz > SHA256SUMS
+            shasum -a 256 ./*.tgz > SHA256SUMS
           fi
       - name: Upload npm dry-run artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
