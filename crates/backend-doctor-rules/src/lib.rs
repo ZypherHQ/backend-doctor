@@ -7456,12 +7456,7 @@ fn run_java_external_tools(
     );
     for report in java_report_files(graph, &["spotbugs", "findbugs"], &["xml"]) {
         if let Ok(output) = fs::read_to_string(graph.root.join(&report)) {
-            push_java_external_diagnostics(
-                graph,
-                disabled,
-                findings,
-                parse_spotbugs_xml(&output).into_iter(),
-            );
+            push_java_external_diagnostics(graph, disabled, findings, parse_spotbugs_xml(&output));
         }
     }
 
