@@ -17,4 +17,9 @@ if ! command -v brew >/dev/null 2>&1; then
   exit 0
 fi
 
-brew audit --formula --strict "$formula"
+if [ "${BACKEND_DOCTOR_HOMEBREW_AUDIT:-}" != "true" ]; then
+  printf 'Skipped Homebrew audit for generated formula path; brew audit requires a tapped formula name.\n'
+  exit 0
+fi
+
+brew audit --formula --strict "${BACKEND_DOCTOR_HOMEBREW_FORMULA_NAME:-backend-doctor}"
